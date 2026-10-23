@@ -84,6 +84,11 @@ export function ProjectsGallery({
                 <span className="absolute left-4 top-4 border border-white/25 bg-ink/70 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-bone/80 backdrop-blur">
                   {pick(locale, project.category_id, project.category_en)}
                 </span>
+                {project.modelUrl || project.demoScene ? (
+                  <span className="absolute right-4 top-4 border border-copper/50 bg-ink/70 px-2.5 py-1 font-mono text-[10px] tracking-[0.14em] text-copper backdrop-blur">
+                    360°
+                  </span>
+                ) : null}
               </div>
 
               <div className="absolute inset-x-0 bottom-0 p-5">

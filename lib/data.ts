@@ -2,6 +2,7 @@ import newsData from "@/data/news.json";
 import projectsData from "@/data/projects.json";
 import servicesData from "@/data/services.json";
 import teamData from "@/data/team.json";
+import demoRoomData from "@/data/demo-room.json";
 
 export type Project = {
   slug: string;
@@ -18,6 +19,21 @@ export type Project = {
   images: string[];
   modelUrl?: string | null;
   poster?: string | null;
+  /** Renders the interactive Kenney demo room instead of a real .glb. */
+  demoScene?: boolean;
+};
+
+export type RoomPiece = {
+  model: string;
+  position: [number, number, number];
+  rotationY?: number;
+  scale?: number;
+};
+
+export type RoomDemo = {
+  scale: number;
+  offset: [number, number, number];
+  pieces: RoomPiece[];
 };
 
 export type Service = {
@@ -51,6 +67,7 @@ export const projects = projectsData as Project[];
 export const services = servicesData as Service[];
 export const team = teamData as TeamMember[];
 export const news = newsData as NewsItem[];
+export const demoRoom = demoRoomData as unknown as RoomDemo;
 
 export function getProject(slug: string): Project | undefined {
   return projects.find((project) => project.slug === slug);

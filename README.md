@@ -4,7 +4,7 @@ Bilingual (`id` / `en`) company profile for Geost Studio: dark industrial landin
 page, project portfolio, 360° viewer (M3), and AI concept preview (M4).
 
 Stack: Next.js 16 App Router, React 19, TypeScript (strict), Tailwind CSS v4.
-Planned 3D: `three` + `@react-three/fiber` + `@react-three/drei`.
+3D: `three` + `@react-three/fiber` + `@react-three/drei`.
 Planned AI: Replicate SDXL img2img, server-side only.
 
 ## Commands
@@ -29,9 +29,10 @@ Verify `lint -> typecheck -> build` before opening a PR.
 | `app/[locale]/{services,pricing,about,contact,preview}/` | Supporting pages |
 | `components/home/` | One component per home section, so sections stay swappable |
 | `components/layout/` | Fixed header (with locale switch) and footer |
-| `components/viewer/` | Reserved for `PortfolioViewer.tsx` (M3) |
+| `components/viewer/` | `PortfolioViewer` shell, `RoomScene` (Kenney demo), `ModelScene` (real `.glb`) |
 | `messages/{id,en}.json` | All UI copy — no user-facing strings in components |
-| `data/*.json` | Projects, services, team, and studio notes |
+| `data/*.json` | Projects, services, team, studio notes, and the demo room layout |
+| `assets-src/kenney/` | Unmodified Kenney furniture kit (source, CC0) |
 | `lib/i18n.ts` | Locale list, dictionary loader, `pick()` helper |
 | `lib/data.ts` | Typed accessors for the JSON content |
 | `lib/site.ts` | Contact numbers, email, social links |
@@ -51,20 +52,65 @@ Verify `lint -> typecheck -> build` before opening a PR.
 ## Editing content
 
 - **Projects** — add an entry to `data/projects.json` (`slug`, `title_id`,
-  `title_en`, `tags`, `images[]`, `modelUrl`). Cards and the detail page follow
-  automatically; add `modelUrl: "/models/<slug>.glb"` once the model exists.
+  `title_en`, `tags`, `images[]`, `modelUrl`, optional `demoScene`). Cards and
+  the detail page follow automatically; add `modelUrl: "/models/<slug>.glb"`
+  once a real model exists, or `demoScene: true` to show the Kenney demo room.
 - **Services / team / notes** — `data/services.json`, `data/team.json`,
   `data/news.json`.
 - **Pricing, FAQ, testimonials, hero slides** — `messages/*.json` under `home`.
 
-## 360° viewer (M3, not built yet)
+## 360° viewer
+
+The viewer lives in `components/viewer/` and renders on project detail pages
+when a project has `modelUrl` (real model) or `demoScene: true` (demo room).
+
+### Demo room (ships now)
+
+`data/demo-room.json` describes a living room assembled from the Kenney
+Furniture Kit (`assets-src/kenney`, CC0). Only the 17 models actually used are
+copied to `public/models/kenney/`.
+
+Each piece is `{ model, position: [x, y, z], rotationY?, scale? }` in kit units
+(1 floor tile = 1 unit, walls are 1.29 units tall); the whole group is scaled
+1.8x and offset so the room is centered on the origin. Floor height is `y=0.05`.
+
+- Change the layout by editing `data/demo-room.json`; every `model` value must
+  exist as `public/models/kenney/<model>.glb`.
+- Copy more pieces from `assets-src/kenney/Models/GLTF format/` when needed.
+- Set `"demoScene": true` on a project in `data/projects.json` to show it.
+  Remove the flag when that project gets a real `.glb`.
+- The UI labels it as a demo on purpose — it is stylized low-poly furniture, not
+  a converted SketchUp project.
+
+### Real project model
 
 1. Export from SketchUp (`glTF` exporter) or Blender
-   (`.dae/.skp` -> `Export glTF (.glb)` with Draco compression).
-2. Keep the final file under 15 MB, store it as `public/models/<slug>.glb` with
-   a `poster-<slug>.webp` next to it.
-3. Point the project entry's `modelUrl` at it. The detail page renders the
-   gallery until a viewer component lands.
+   (`.dae/.skp` -> `Export glTF (.glb)`), compress with Draco, keep it under
+   15 MB.
+2. Save as `public/models/<slug>.glb` with `poster-<slug>.webp` next to it.
+3. Set `"modelUrl": "/models/<slug>.glb"` on the project entry. `ModelScene`
+   centers and scales the model automatically.
+
+### Viewer rules
+
+- `"use client"`, `<Suspense>`, `dpr={[1,2]}`, `OrbitControls` with autoRotate
+  and zoom, reset + fullscreen + keyboard-friendly rotate buttons.
+- Loading and error states never leave the panel blank; the photo gallery stays
+  below the viewer.
+- On unmount the viewer disposes geometries/materials and clears the
+  `useGLTF` cache.
+- No `three` import in server components or route handlers.
+
+Furniture models: [Kenney](https://kenney.nl) Furniture Kit, CC0.
+
+### Visual check
+
+```bash
+npm run dev
+node scripts/shot.mjs http://localhost:3000/id/projects/studio-geost
+node scripts/shot-mobile.mjs
+```
+
 
 ## AI preview (M4, not built yet)
 

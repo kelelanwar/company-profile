@@ -5,6 +5,7 @@ import { projects } from "@/lib/data";
 import { getDictionary, pick, type Locale } from "@/lib/i18n";
 import { btnGhost, btnPrimary } from "@/lib/styles";
 import { mailtoUrl, whatsappUrl } from "@/lib/site";
+import { PortfolioViewer } from "@/components/viewer/PortfolioViewer";
 
 type DetailProps = {
   locale: Locale;
@@ -66,6 +67,29 @@ export async function ProjectDetail({ locale, project }: DetailProps) {
         </div>
       </header>
 
+      {project.modelUrl || project.demoScene ? (
+        <section className="shell pt-14 md:pt-16">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <p className="eyebrow">{copy.viewerTitle}</p>
+            {project.demoScene ? (
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+                {dict.viewer.demoBadge}
+              </p>
+            ) : null}
+          </div>
+          <PortfolioViewer
+            dict={dict.viewer}
+            modelUrl={project.modelUrl}
+            demoScene={project.demoScene}
+          />
+          {project.demoScene ? (
+            <p className="mt-3 max-w-2xl text-xs leading-relaxed text-muted/80">
+              {dict.viewer.demoNote}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+
       <div className="shell grid gap-14 py-16 lg:grid-cols-[1.6fr_1fr] lg:gap-20 md:py-20">
         <div>
           <p className="eyebrow">{copy.overview}</p>
@@ -90,7 +114,7 @@ export async function ProjectDetail({ locale, project }: DetailProps) {
             ))}
           </div>
 
-          {project.modelUrl ? null : (
+          {project.modelUrl || project.demoScene ? null : (
             <p className="mt-8 border border-line bg-surface px-5 py-4 text-sm leading-relaxed text-muted">
               {copy.viewerNotice}
             </p>

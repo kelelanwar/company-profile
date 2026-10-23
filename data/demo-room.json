@@ -1,0 +1,50 @@
+{
+  "scale": 1.8,
+  "offset": [-3.6, 0, 2.7],
+  "pieces": [
+    { "model": "floorFull", "position": [0, 0, 0] },
+    { "model": "floorFull", "position": [1, 0, 0] },
+    { "model": "floorFull", "position": [2, 0, 0] },
+    { "model": "floorFull", "position": [3, 0, 0] },
+    { "model": "floorFull", "position": [0, 0, -1] },
+    { "model": "floorFull", "position": [1, 0, -1] },
+    { "model": "floorFull", "position": [2, 0, -1] },
+    { "model": "floorFull", "position": [3, 0, -1] },
+    { "model": "floorFull", "position": [0, 0, -2] },
+    { "model": "floorFull", "position": [1, 0, -2] },
+    { "model": "floorFull", "position": [2, 0, -2] },
+    { "model": "floorFull", "position": [3, 0, -2] },
+
+    { "model": "wall", "position": [0, 0, 0] },
+    { "model": "wallWindow", "position": [1, 0, 0] },
+    { "model": "wall", "position": [2, 0, 0] },
+    { "model": "wall", "position": [3, 0, 0] },
+
+    { "model": "wall", "position": [0, 0, 0], "rotationY": 1.5708 },
+    { "model": "wall", "position": [0, 0, -1], "rotationY": 1.5708 },
+    { "model": "wall", "position": [0, 0, -2], "rotationY": 1.5708 },
+
+    { "model": "rugRectangle", "position": [0.98, 0.05, -0.95], "scale": 1.3 },
+
+    { "model": "loungeSofaLong", "position": [2.49, 0.05, -2.7], "rotationY": 3.1416 },
+    { "model": "tableCoffee", "position": [2.13, 0.05, -1.45] },
+    { "model": "loungeChair", "position": [0.55, 0.05, -2.6], "rotationY": -1.5708 },
+    { "model": "loungeChair", "position": [3.46, 0.05, -1.36], "rotationY": 1.5708 },
+
+    { "model": "pottedPlant", "position": [3.6, 0.05, -0.45] },
+
+    { "model": "cabinetTelevision", "position": [2.4, 0.05, -0.32], "rotationY": 3.1416 },
+    { "model": "televisionModern", "position": [2.0, 0.36, -0.16], "rotationY": 3.1416 },
+    { "model": "bookcaseOpen", "position": [0.05, 0.05, -0.55], "rotationY": -1.5708 },
+
+    { "model": "paneling", "position": [2.95, 0.6, -0.04] },
+    { "model": "paneling", "position": [3.5, 0.6, -0.04] },
+
+    { "model": "pillow", "position": [1.7, 0.31, -2.45], "rotationY": 0.15 },
+    { "model": "pillow", "position": [2.25, 0.31, -2.45], "rotationY": -0.1 },
+
+    { "model": "books", "position": [2.05, 0.28, -1.55], "rotationY": 0.2 },
+    { "model": "books", "position": [2.03, 0.38, -1.53], "rotationY": 0.45 },
+    { "model": "plantSmall1", "position": [0.45, 0.05, -0.9] }
+  ]
+}

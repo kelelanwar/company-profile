@@ -43,6 +43,21 @@
       "furniture": "Furniture"
     }
   },
+  "viewer": {
+    "badge": "360°",
+    "demoBadge": "Ruang demo",
+    "hint": "Tarik untuk memutar · cubit untuk zoom",
+    "reset": "Reset tampilan",
+    "fullscreen": "Layar penuh",
+    "exitFullscreen": "Keluar layar penuh",
+    "loading": "Memuat model…",
+    "errorTitle": "Model 3D tidak bisa dimuat",
+    "errorBody": "Galeri foto proyek tetap tersedia di bawah.",
+    "demoNote": "Ruang demo disusun dari kit furnitur low-poly (Kenney, CC0) — bukan hasil proyek asli.",
+    "canvasLabel": "Penampil 3D interaktif",
+    "rotateLeft": "Putar ke kiri",
+    "rotateRight": "Putar ke kanan"
+  },
   "home": {
     "hero": {
       "slides": [
@@ -249,6 +264,7 @@
       "area": "Luas",
       "category": "Kategori",
       "gallery": "Galeri",
+      "viewerTitle": "Tur 360°",
       "viewerNotice": "Model 360° untuk proyek ini sedang disiapkan. Sementara itu, jelajahi galeri foto di bawah.",
       "ctaTitle": "Ingin ruang dengan pendekatan seperti ini?",
       "ctaBody": "Kami bisa mulai dari foto ruangan Anda dan satu percakapan singkat.",

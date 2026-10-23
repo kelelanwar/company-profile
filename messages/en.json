@@ -43,6 +43,21 @@
       "furniture": "Furniture"
     }
   },
+  "viewer": {
+    "badge": "360°",
+    "demoBadge": "Demo room",
+    "hint": "Drag to orbit · pinch to zoom",
+    "reset": "Reset view",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit fullscreen",
+    "loading": "Loading model…",
+    "errorTitle": "The 3D model could not load",
+    "errorBody": "The project photo gallery is still available below.",
+    "demoNote": "Demo room assembled from a low-poly furniture kit (Kenney, CC0) — not a real project.",
+    "canvasLabel": "Interactive 3D viewer",
+    "rotateLeft": "Rotate left",
+    "rotateRight": "Rotate right"
+  },
   "home": {
     "hero": {
       "slides": [
@@ -249,6 +264,7 @@
       "area": "Area",
       "category": "Category",
       "gallery": "Gallery",
+      "viewerTitle": "360° tour",
       "viewerNotice": "The 360° model for this project is being prepared. In the meantime, explore the photo gallery below.",
       "ctaTitle": "Want a space handled this way?",
       "ctaBody": "We can start from a photo of your room and one short conversation.",
