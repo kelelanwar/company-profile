@@ -391,7 +391,15 @@
         "expiry": "Result links are temporary (about 1 hour). Download it if you want to keep it.",
         "idleTitle": "Your preview will appear here",
         "idleBody": "Upload a photo, write the direction, then press Generate preview.",
-        "previewAlt": "AI concept preview of the room"
+        "previewAlt": "AI concept preview of the room",
+        "modeLabel": "Mode",
+        "modeEdit": "From a photo",
+        "modeGenerate": "From a description",
+        "generateHint": "No photo needed — just describe the room you want.",
+        "generateAlt": "AI generated room concept",
+        "resultTitleEdit": "Before / after",
+        "resultTitleGenerate": "Concept result",
+        "whatsappCta": "Discuss on WhatsApp"
       },
       "errors": {
         "rate_limited": "Too many requests. Wait a minute and try again.",
@@ -403,7 +411,8 @@
         "provider_error": "The preview could not be generated. Please try again.",
         "network": "The connection dropped. Check your network and try again.",
         "timeout": "The preview is taking longer than usual. Please try again.",
-        "unknown": "Something went wrong. Please try again."
+        "unknown": "Something went wrong. Please try again.",
+        "model_unavailable": "This mode is not available from the AI provider right now. Try the other mode or contact us."
       }
     }
   },

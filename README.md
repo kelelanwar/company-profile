@@ -177,14 +177,23 @@ sees the API token and never calls the provider directly.
   localized copy; codes: `missing_token`, `rate_limited`, `invalid_image`,
   `image_too_large`, `invalid_prompt`, `blocked_prompt`, `provider_error`.
 
+### Modes
+
+| Mode | Endpoint | Notes |
+| --- | --- | --- |
+| `edit` (img2img) | `/v1/images/edits` (Ruvicode) or SDXL `image` + `prompt_strength` (Replicate) | Keeps the room geometry; before/after slider in the UI. |
+| `generate` (text2img) | `/v1/images/generations` (Ruvicode, JSON body) or SDXL without `image` (Replicate) | No upload needed; the UI shows a single 16:9 concept. |
+
+`mode` is a form field (`edit` default) and is validated by `zod`.
+
 ### Providers
 
 Two adapters live in `lib/preview/providers.ts`; the route stays the same.
 
 | Provider | Env | Behaviour |
 | --- | --- | --- |
-| **Ruvicode** (default when its key exists) | `RUVICODE_API_KEY=rvcd_…` | `POST /v1/images/edits` (multipart, model `ruvicode-image-edit`), synchronous, returns the image as base64 → served as a data URL. No expiry, no polling. |
-| **Replicate** | `REPLICATE_API_TOKEN=r8_…` | SDXL img2img, async prediction + polling, returns a temporary URL (~1 hour). |
+| **Ruvicode** (default when its key exists) | `RUVICODE_API_KEY=rvcd_…` | OpenAI-compatible. Edit returns the image as base64 (data URL, no expiry), generate accepts a JSON body. |
+| **Replicate** | `REPLICATE_API_TOKEN=r8_…` | SDXL, async prediction + polling, temporary URL (~1 hour) for both modes. |
 
 Selection: `PREVIEW_PROVIDER=ruvicode|replicate` forces one; without it the
 app picks whichever key is configured (Ruvicode first).
@@ -192,12 +201,16 @@ app picks whichever key is configured (Ruvicode first).
 Optional overrides:
 
 ```bash
-RUVICODE_IMAGE_MODEL=ruvicode-image-edit   # or …-uncensored
+RUVICODE_MODEL=ruvicode-image              # generate
+RUVICODE_EDIT_MODEL=ruvicode-image-edit    # edit (check availability first)
 RUVICODE_BASE_URL=https://api.ruvicode.com/v1
 ```
 
-`prompt_strength` only exists on the Replicate path; Ruvicode keeps the input
-geometry (`aspect_ratio: auto`) and applies the prompt as an edit.
+If the provider answers `403`/`404` for a model (not enabled for the key, or
+temporarily unavailable), the API returns `503 model_unavailable` and the UI
+suggests switching mode instead of showing a generic failure.
+
+`prompt_strength` only exists on the Replicate edit path.
 
 ### Configuration
 

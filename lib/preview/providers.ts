@@ -1,21 +1,28 @@
 import Replicate from "replicate";
 
 export type PreviewProvider = "ruvicode" | "replicate";
+export type PreviewMode = "edit" | "generate";
 
 export type ProviderConfig = {
   provider: PreviewProvider;
   key: string;
 };
 
-export type ProviderFailure = "content_policy" | "rate_limited" | "provider_error";
+export type ProviderFailure =
+  | "content_policy"
+  | "rate_limited"
+  | "model_unavailable"
+  | "provider_error";
 
 export type StartInput = {
-  bytes: Uint8Array;
-  mime: "image/jpeg" | "image/png" | "image/webp";
+  mode: PreviewMode;
   /** Prompt already composed with the preset style. */
   prompt: string;
   /** Only used by Replicate SDXL (0.3–0.6). */
   strength: number;
+  /** Required when mode is "edit". */
+  bytes?: Uint8Array;
+  mime?: "image/jpeg" | "image/png" | "image/webp";
 };
 
 export type StartResult =
@@ -27,11 +34,18 @@ export type Outcome<T> =
   | { ok: false; error: ProviderFailure };
 
 const REPLICATE_MODEL = "stability-ai/sdxl";
-const RUVICODE_DEFAULT_MODEL = "ruvicode-image-edit";
 
 function ruvicodeBaseUrl(): string {
   const raw = process.env.RUVICODE_BASE_URL?.trim() || "https://api.ruvicode.com/v1";
   return raw.replace(/\/+$/, "");
+}
+
+function ruvicodeModel(mode: PreviewMode): string {
+  if (mode === "edit") {
+    return process.env.RUVICODE_EDIT_MODEL?.trim() || "ruvicode-image-edit";
+  }
+
+  return process.env.RUVICODE_MODEL?.trim() || "ruvicode-image";
 }
 
 export function resolveProvider(): ProviderConfig | null {
@@ -66,22 +80,55 @@ async function startRuvicode(
   key: string,
   input: StartInput,
 ): Promise<Outcome<StartResult>> {
-  const form = new FormData();
-  form.append("model", process.env.RUVICODE_IMAGE_MODEL?.trim() || RUVICODE_DEFAULT_MODEL);
-  form.append("prompt", input.prompt);
-  // Copy into an ArrayBuffer-backed view so it satisfies BlobPart.
-  form.append("image", new Blob([new Uint8Array(input.bytes)], { type: input.mime }), "room.jpg");
-  form.append("aspect_ratio", "auto");
-  form.append("output_format", "jpeg");
-  form.append("n", "1");
-  form.append("store", "false");
+  const isEdit = input.mode === "edit";
+  const endpoint = isEdit ? "edits" : "generations";
+  const url = `${ruvicodeBaseUrl()}/images/${endpoint}`;
 
-  let response: Response;
-  try {
-    response = await fetch(`${ruvicodeBaseUrl()}/images/edits`, {
+  let requestInit: RequestInit;
+
+  if (isEdit) {
+    if (!input.bytes || !input.mime) {
+      return { ok: false, error: "provider_error" };
+    }
+
+    const form = new FormData();
+    form.append("model", ruvicodeModel("edit"));
+    form.append("prompt", input.prompt);
+    form.append("output_format", "jpeg");
+    form.append("n", "1");
+    form.append("store", "false");
+    form.append("aspect_ratio", "auto");
+    // Copy into an ArrayBuffer-backed view so it satisfies BlobPart.
+    form.append("image", new Blob([new Uint8Array(input.bytes)], { type: input.mime }), "room.jpg");
+
+    requestInit = {
       method: "POST",
       headers: { authorization: `Bearer ${key}` },
       body: form,
+    };
+  } else {
+    // /images/generations only accepts a JSON body.
+    requestInit = {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${key}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: ruvicodeModel("generate"),
+        prompt: input.prompt,
+        aspect_ratio: "16:9",
+        output_format: "jpeg",
+        n: 1,
+        store: false,
+      }),
+    };
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...requestInit,
       signal: AbortSignal.timeout(55_000),
       cache: "no-store",
     });
@@ -91,7 +138,7 @@ async function startRuvicode(
 
   if (!response.ok) {
     const failure = mapRuvicodeStatus(response.status, await readErrorType(response));
-    console.error("[preview] ruvicode error", response.status, failure);
+    console.error("[preview] ruvicode error", response.status, endpoint, failure);
     return { ok: false, error: failure };
   }
 
@@ -113,18 +160,27 @@ async function startReplicate(
   key: string,
   input: StartInput,
 ): Promise<Outcome<StartResult>> {
+  const baseInput = {
+    prompt: input.prompt,
+    num_inference_steps: 30,
+    guidance_scale: 7.5,
+    negative_prompt: "blurry, distorted geometry, watermark, text, low quality",
+  };
+
+  const modelInput =
+    input.mode === "edit" && input.bytes && input.mime
+      ? {
+          ...baseInput,
+          image: `data:${input.mime};base64,${Buffer.from(input.bytes).toString("base64")}`,
+          prompt_strength: input.strength,
+        }
+      : { ...baseInput, width: 1024, height: 1024 };
+
   try {
     const replicate = new Replicate({ auth: key });
     const prediction = await replicate.predictions.create({
       model: REPLICATE_MODEL,
-      input: {
-        image: `data:${input.mime};base64,${Buffer.from(input.bytes).toString("base64")}`,
-        prompt: input.prompt,
-        prompt_strength: input.strength,
-        num_inference_steps: 30,
-        guidance_scale: 7.5,
-        negative_prompt: "blurry, distorted geometry, watermark, text, low quality",
-      },
+      input: modelInput,
     });
 
     return { ok: true, value: { kind: "pending", id: prediction.id } };
@@ -183,6 +239,8 @@ async function readErrorType(response: Response): Promise<string> {
 function mapRuvicodeStatus(status: number, type: string): ProviderFailure {
   if (status === 400 && type === "content_policy_violation") return "content_policy";
   if (status === 429) return "rate_limited";
+  // 404: model temporarily unavailable. 403: the key may not call this model.
+  if (status === 403 || status === 404) return "model_unavailable";
   return "provider_error";
 }
 

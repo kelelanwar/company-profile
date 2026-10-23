@@ -391,7 +391,15 @@
         "expiry": "Tautan hasil berlaku sementara (±1 jam). Unduh jika ingin menyimpannya.",
         "idleTitle": "Hasil pratinjau muncul di sini",
         "idleBody": "Unggah foto, tulis arahan, lalu tekan Buat pratinjau.",
-        "previewAlt": "Pratinjau konsep AI untuk ruangan"
+        "previewAlt": "Pratinjau konsep AI untuk ruangan",
+        "modeLabel": "Mode",
+        "modeEdit": "Dari foto",
+        "modeGenerate": "Dari deskripsi",
+        "generateHint": "Tidak perlu foto — cukup jelaskan ruangan yang Anda inginkan.",
+        "generateAlt": "Konsep ruangan hasil AI",
+        "resultTitleEdit": "Sebelum / sesudah",
+        "resultTitleGenerate": "Hasil konsep",
+        "whatsappCta": "Diskusikan via WhatsApp"
       },
       "errors": {
         "rate_limited": "Terlalu banyak permintaan. Tunggu satu menit lalu coba lagi.",
@@ -403,7 +411,8 @@
         "provider_error": "Gagal membuat pratinjau. Coba lagi sebentar.",
         "network": "Koneksi terputus. Periksa jaringan lalu coba lagi.",
         "timeout": "Pratinjau memakan waktu lebih lama dari biasanya. Coba lagi.",
-        "unknown": "Terjadi kesalahan. Coba lagi."
+        "unknown": "Terjadi kesalahan. Coba lagi.",
+        "model_unavailable": "Mode ini sedang tidak tersedia di penyedia AI. Coba mode lain atau hubungi kami."
       }
     }
   },
