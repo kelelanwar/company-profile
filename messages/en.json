@@ -91,10 +91,22 @@
     },
     "statsLabel": "Key figures",
     "stats": [
-      { "value": "12", "label": "Years of practice" },
-      { "value": "120+", "label": "Completed projects" },
-      { "value": "38", "label": "Corporate clients" },
-      { "value": "360°", "label": "Interactive visualization" }
+      {
+        "value": "12",
+        "label": "Years of practice"
+      },
+      {
+        "value": "120+",
+        "label": "Completed projects"
+      },
+      {
+        "value": "38",
+        "label": "Corporate clients"
+      },
+      {
+        "value": "360°",
+        "label": "Interactive visualization"
+      }
     ],
     "about": {
       "eyebrow": "About Geost",
@@ -295,9 +307,18 @@
       "description": "Geost Studio has been based in Bandung since 2014. We handle residential interiors, workspaces, and hospitality with a core team of nine.",
       "valuesTitle": "How we work",
       "values": [
-        { "title": "One table, three disciplines", "body": "Designer, estimator, and site supervisor sit in one team so decisions never stall." },
-        { "title": "Drawings you can build from", "body": "Every detail is drawn down to the joint, not just the atmosphere." },
-        { "title": "Open costs", "body": "The cost breakdown is itemized so you know where the budget goes." }
+        {
+          "title": "One table, three disciplines",
+          "body": "Designer, estimator, and site supervisor sit in one team so decisions never stall."
+        },
+        {
+          "title": "Drawings you can build from",
+          "body": "Every detail is drawn down to the joint, not just the atmosphere."
+        },
+        {
+          "title": "Open costs",
+          "body": "The cost breakdown is itemized so you know where the budget goes."
+        }
       ]
     },
     "contact": {
@@ -322,14 +343,68 @@
       "title": "See what your room could become, in seconds.",
       "description": "Upload a photo of your room, describe the direction you want, and get a concept image to start the conversation.",
       "steps": [
-        { "title": "Upload a photo", "body": "Use a bright, clear photo of the room, JPG/PNG/WebP up to 5 MB." },
-        { "title": "Describe it", "body": "For example: “industrial living room, brick wall, warm lighting”." },
-        { "title": "Discuss the result", "body": "Bring it to WhatsApp so we can translate it into a real design." }
+        {
+          "title": "Upload a photo",
+          "body": "Use a bright, clear photo of the room, JPG/PNG/WebP up to 5 MB."
+        },
+        {
+          "title": "Describe it",
+          "body": "For example: “industrial living room, brick wall, warm lighting”."
+        },
+        {
+          "title": "Discuss the result",
+          "body": "Bring it to WhatsApp so we can translate it into a real design."
+        }
       ],
       "notice": "AI preview is a concept only, not a final construction result. Proportions, materials, and costs are still decided by technical design.",
-      "statusTitle": "The preview studio is being prepared",
-      "statusBody": "The upload form and AI results go live in the next milestone. For now, send your room photo over WhatsApp and we will follow up faster.",
-      "cta": "Send a photo on WhatsApp"
+      "cta": "Send a photo on WhatsApp",
+      "form": {
+        "uploadTitle": "Room photo",
+        "uploadCta": "Choose a photo",
+        "replaceCta": "Replace photo",
+        "uploadHint": "JPG, PNG, or WebP · up to 5 MB",
+        "dropHint": "Drop a photo here, or click to choose one",
+        "promptLabel": "Design direction",
+        "promptPlaceholder": "Example: industrial living room, exposed brick, warm lighting, grey sofa",
+        "promptHint": "3–500 characters. The more specific, the closer the result.",
+        "chars": "characters",
+        "presetLabel": "Style",
+        "presets": {
+          "industrial": "Industrial",
+          "warmMinimal": "Warm minimal",
+          "japandi": "Japandi",
+          "luxury": "Luxury",
+          "retail": "Retail"
+        },
+        "submit": "Generate preview",
+        "submitting": "Sending…",
+        "working": "Preparing the preview…",
+        "queue": "Waiting in the queue…",
+        "rendering": "Rendering the concept…",
+        "disclaimer": "AI output is a concept only, not a final construction result.",
+        "resultTitle": "Before / after",
+        "before": "Before",
+        "after": "After",
+        "sliderLabel": "Drag to compare",
+        "download": "Download result",
+        "again": "Try another direction",
+        "expiry": "Result links are temporary (about 1 hour). Download it if you want to keep it.",
+        "idleTitle": "Your preview will appear here",
+        "idleBody": "Upload a photo, write the direction, then press Generate preview.",
+        "previewAlt": "AI concept preview of the room"
+      },
+      "errors": {
+        "rate_limited": "Too many requests. Wait a minute and try again.",
+        "invalid_image": "Please use a JPG, PNG, or WebP image.",
+        "image_too_large": "The image must be 5 MB or smaller.",
+        "invalid_prompt": "Describe the direction in 3–500 characters.",
+        "blocked_prompt": "The prompt contains a blocked term. Please rephrase it.",
+        "missing_token": "AI preview is not enabled in this environment. Reach us on WhatsApp.",
+        "provider_error": "The preview could not be generated. Please try again.",
+        "network": "The connection dropped. Check your network and try again.",
+        "timeout": "The preview is taking longer than usual. Please try again.",
+        "unknown": "Something went wrong. Please try again."
+      }
     }
   },
   "footer": {

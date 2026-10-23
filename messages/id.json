@@ -91,10 +91,22 @@
     },
     "statsLabel": "Angka kunci",
     "stats": [
-      { "value": "12", "label": "Tahun praktik" },
-      { "value": "120+", "label": "Proyek selesai" },
-      { "value": "38", "label": "Klien korporat" },
-      { "value": "360°", "label": "Visualisasi interaktif" }
+      {
+        "value": "12",
+        "label": "Tahun praktik"
+      },
+      {
+        "value": "120+",
+        "label": "Proyek selesai"
+      },
+      {
+        "value": "38",
+        "label": "Klien korporat"
+      },
+      {
+        "value": "360°",
+        "label": "Visualisasi interaktif"
+      }
     ],
     "about": {
       "eyebrow": "Tentang Geost",
@@ -295,9 +307,18 @@
       "description": "Geost Studio berdiri sejak 2014 di Bandung. Kami menangani interior residensial, ruang kerja, dan hospitality dengan tim inti 9 orang.",
       "valuesTitle": "Cara kami bekerja",
       "values": [
-        { "title": "Satu meja, tiga disiplin", "body": "Desainer, estimator, dan pengawas duduk dalam satu tim agar keputusan tidak tertunda." },
-        { "title": "Gambar yang bisa dibangun", "body": "Setiap detail digambar sampai sambungan, bukan hanya suasana." },
-        { "title": "Biaya terbuka", "body": "RAB dirinci per item sehingga Anda tahu ke mana anggaran pergi." }
+        {
+          "title": "Satu meja, tiga disiplin",
+          "body": "Desainer, estimator, dan pengawas duduk dalam satu tim agar keputusan tidak tertunda."
+        },
+        {
+          "title": "Gambar yang bisa dibangun",
+          "body": "Setiap detail digambar sampai sambungan, bukan hanya suasana."
+        },
+        {
+          "title": "Biaya terbuka",
+          "body": "RAB dirinci per item sehingga Anda tahu ke mana anggaran pergi."
+        }
       ]
     },
     "contact": {
@@ -322,14 +343,68 @@
       "title": "Lihat kemungkinan ruang Anda dalam hitungan detik.",
       "description": "Unggah foto ruangan, tuliskan arah desain yang Anda inginkan, dan dapatkan gambar konsep sebagai bahan diskusi awal.",
       "steps": [
-        { "title": "Unggah foto", "body": "Gunakan foto ruangan yang terang, JPG/PNG/WebP maksimal 5 MB." },
-        { "title": "Tulis arahan", "body": "Contoh: “ruang tamu industrial, dinding bata, pencahayaan hangat”." },
-        { "title": "Diskusikan hasilnya", "body": "Bawa hasilnya ke WhatsApp kami untuk diterjemahkan menjadi desain nyata." }
+        {
+          "title": "Unggah foto",
+          "body": "Gunakan foto ruangan yang terang, JPG/PNG/WebP maksimal 5 MB."
+        },
+        {
+          "title": "Tulis arahan",
+          "body": "Contoh: “ruang tamu industrial, dinding bata, pencahayaan hangat”."
+        },
+        {
+          "title": "Diskusikan hasilnya",
+          "body": "Bawa hasilnya ke WhatsApp kami untuk diterjemahkan menjadi desain nyata."
+        }
       ],
       "notice": "Pratinjau AI hanya konsep, bukan hasil akhir konstruksi. Proporsi, material, dan biaya tetap ditentukan oleh desain teknis.",
-      "statusTitle": "Studio pratinjau sedang disiapkan",
-      "statusBody": "Form unggah dan hasil AI aktif pada tahap berikutnya. Sementara ini, kirim foto ruangan Anda lewat WhatsApp agar kami bisa menindaklanjuti lebih cepat.",
-      "cta": "Kirim foto via WhatsApp"
+      "cta": "Kirim foto via WhatsApp",
+      "form": {
+        "uploadTitle": "Foto ruangan",
+        "uploadCta": "Pilih foto",
+        "replaceCta": "Ganti foto",
+        "uploadHint": "JPG, PNG, atau WebP · maksimal 5 MB",
+        "dropHint": "Tarik foto ke sini, atau klik untuk memilih",
+        "promptLabel": "Arahan desain",
+        "promptPlaceholder": "Contoh: ruang tamu industrial, dinding bata ekspos, pencahayaan hangat, sofa abu-abu",
+        "promptHint": "3–500 karakter. Semakin spesifik, semakin dekat hasilnya.",
+        "chars": "karakter",
+        "presetLabel": "Gaya",
+        "presets": {
+          "industrial": "Industrial",
+          "warmMinimal": "Minimal hangat",
+          "japandi": "Japandi",
+          "luxury": "Luxury",
+          "retail": "Retail"
+        },
+        "submit": "Buat pratinjau",
+        "submitting": "Mengirim…",
+        "working": "Menyiapkan pratinjau…",
+        "queue": "Menunggu antrean…",
+        "rendering": "Merender konsep…",
+        "disclaimer": "Hasil AI hanya konsep, bukan hasil akhir konstruksi.",
+        "resultTitle": "Sebelum / sesudah",
+        "before": "Sebelum",
+        "after": "Sesudah",
+        "sliderLabel": "Geser untuk membandingkan",
+        "download": "Unduh hasil",
+        "again": "Coba arahan lain",
+        "expiry": "Tautan hasil berlaku sementara (±1 jam). Unduh jika ingin menyimpannya.",
+        "idleTitle": "Hasil pratinjau muncul di sini",
+        "idleBody": "Unggah foto, tulis arahan, lalu tekan Buat pratinjau.",
+        "previewAlt": "Pratinjau konsep AI untuk ruangan"
+      },
+      "errors": {
+        "rate_limited": "Terlalu banyak permintaan. Tunggu satu menit lalu coba lagi.",
+        "invalid_image": "Gunakan gambar JPG, PNG, atau WebP.",
+        "image_too_large": "Ukuran gambar maksimal 5 MB.",
+        "invalid_prompt": "Tuliskan arahan 3–500 karakter.",
+        "blocked_prompt": "Arahan berisi kata yang tidak diizinkan. Ubah deskripsi Anda.",
+        "missing_token": "Pratinjau AI belum aktif di lingkungan ini. Hubungi kami lewat WhatsApp.",
+        "provider_error": "Gagal membuat pratinjau. Coba lagi sebentar.",
+        "network": "Koneksi terputus. Periksa jaringan lalu coba lagi.",
+        "timeout": "Pratinjau memakan waktu lebih lama dari biasanya. Coba lagi.",
+        "unknown": "Terjadi kesalahan. Coba lagi."
+      }
     }
   },
   "footer": {

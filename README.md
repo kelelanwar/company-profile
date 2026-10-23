@@ -5,7 +5,7 @@ page, project portfolio, 360° viewer (M3), and AI concept preview (M4).
 
 Stack: Next.js 16 App Router, React 19, TypeScript (strict), Tailwind CSS v4.
 3D: `three` + `@react-three/fiber` + `@react-three/drei`.
-Planned AI: Replicate SDXL img2img, server-side only.
+AI: Replicate SDXL img2img through a server-side route handler.
 
 ## Commands
 
@@ -29,7 +29,9 @@ Verify `lint -> typecheck -> build` before opening a PR.
 | `app/[locale]/{services,pricing,about,contact,preview}/` | Supporting pages |
 | `components/home/` | One component per home section, so sections stay swappable |
 | `components/layout/` | Fixed header (with locale switch) and footer |
-| `components/viewer/` | `PortfolioViewer` shell, `RoomScene` (Kenney demo), `ModelScene` (real `.glb`) |
+| `components/viewer/` | `PortfolioViewer` shell, `RoomScene` (Kenney demo), `PanoramaViewer`, `ModelScene` |
+| `components/preview/` | `PreviewStudio` — upload, prompt, presets, polling, before/after |
+| `app/api/preview/route.ts` | Server-side Replicate img2img endpoint (POST + GET poll) |
 | `messages/{id,en}.json` | All UI copy — no user-facing strings in components |
 | `data/*.json` | Projects, services, team, studio notes, and the demo room layout |
 | `assets-src/kenney/` | Unmodified Kenney furniture kit (source, CC0) |
@@ -143,12 +145,59 @@ node scripts/shot-mobile.mjs http://localhost:3000/en/projects/rumah-kubu-bandun
 ```
 
 
-## AI preview (M4, not built yet)
+## AI preview (M4)
 
-- Endpoint will be `app/api/preview/route.ts`, server-side only, with `zod`
-  validation, 5 MB upload cap, 500-character prompt cap, and 10 req/min/IP.
-- `REPLICATE_API_TOKEN` belongs in `.env.local` and must never be prefixed with
-  `NEXT_PUBLIC_`.
+`app/api/preview/route.ts` proxies Replicate SDXL img2img. The browser never
+sees the API token and never calls the provider directly.
+
+### Flow
+
+1. `components/preview/PreviewStudio.tsx` validates the file on the client,
+   re-encodes it through a canvas (strips EXIF/GPS, caps the long edge at
+   1536 px) and sends multipart form data.
+2. `POST /api/preview` validates with `zod`, checks the file signature, and
+   starts a prediction (`stability-ai/sdxl`, `prompt_strength` 0.3–0.6,
+   default 0.45, 30 steps). It returns `{ predictionId, status }`.
+3. The client polls `GET /api/preview?id=…` every 2 s (max ~100 s) and renders
+   the temporary image URL with a before/after slider, download link, and a
+   WhatsApp hand-off that carries the prompt.
+
+### Limits and guards
+
+- Upload: 5 MB, JPG/PNG/WebP only, verified by magic bytes (`ff d8 ff`,
+  PNG signature, `RIFF…WEBP`), not just the MIME header.
+- Prompt: 3–500 characters, plus a small bilingual block list for NSFW terms.
+- Rate limit: 10 predictions/minute/IP, 240 polls/minute/IP. It is an
+  in-memory map (fine for local dev and single-instance hosting); swap in
+  Upstash/Redis before scaling to multiple serverless instances.
+- Uploads live in memory only — nothing is written to `public/` or `/tmp`, and
+  base64 data or tokens are never logged.
+- Errors return `{ error: { code, message: { id, en } } }` so the UI can show
+  localized copy; codes: `missing_token`, `rate_limited`, `invalid_image`,
+  `image_too_large`, `invalid_prompt`, `blocked_prompt`, `provider_error`.
+
+### Configuration
+
+```bash
+# .env.local (never commit, never prefix with NEXT_PUBLIC_)
+REPLICATE_API_TOKEN=r8_...
+```
+
+Without a token the endpoint returns 503 `missing_token` and the UI shows the
+bilingual "not configured" message, so the page stays usable in previews.
+
+### Quick checks
+
+```bash
+curl -X POST http://localhost:3000/api/preview \
+  -F "image=@room.jpg;type=image/jpeg" \
+  -F "prompt=industrial living room, brick wall" -F "locale=en"
+# -> 422 / 503 / 429 / 201 depending on the input and configuration
+```
+
+Result URLs from Replicate expire after roughly an hour; the UI says so and
+offers a download button.
+
 
 ## Placeholders to replace before launch
 
