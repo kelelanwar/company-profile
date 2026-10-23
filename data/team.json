@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Arga Saputra",
+    "role_id": "Arsitek utama",
+    "role_en": "Principal architect",
+    "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "name": "Nadia Prameswari",
+    "role_id": "Lead interior",
+    "role_en": "Interior lead",
+    "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "name": "Bagas Wirawan",
+    "role_id": "Manajer proyek",
+    "role_en": "Project manager",
+    "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80"
+  }
+]

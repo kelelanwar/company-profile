@@ -1,0 +1,35 @@
+[
+  {
+    "slug": "memilih-kayu-untuk-interior-lembap",
+    "title_id": "Memilih kayu untuk interior lembap",
+    "title_en": "Choosing timber for humid interiors",
+    "excerpt_id": "Tiga jenis kayu yang kami pakai di Bandung dan alasan di baliknya.",
+    "excerpt_en": "Three timber species we use in Bandung and the reasoning behind each.",
+    "category_id": "Material",
+    "category_en": "Material",
+    "date": "2026-09-18",
+    "image": "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1000&q=80"
+  },
+  {
+    "slug": "kenapa-render-360-menghemat-revisi",
+    "title_id": "Kenapa render 360° menghemat revisi",
+    "title_en": "Why 360° renders cut revisions",
+    "excerpt_id": "Data dari 14 proyek terakhir: keputusan desain lebih cepat saat klien bisa berjalan di dalam ruang.",
+    "excerpt_en": "Data from our last 14 projects: design decisions move faster when clients can walk the room.",
+    "category_id": "Proses",
+    "category_en": "Process",
+    "date": "2026-08-30",
+    "image": "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1000&q=80"
+  },
+  {
+    "slug": "rumah-kubu-selesai",
+    "title_id": "Rumah Kubu selesai setelah 19 minggu",
+    "title_en": "Kubu House finished in 19 weeks",
+    "excerpt_id": "Catatan lapangan dari renovasi rumah keluarga di lereng utara Bandung.",
+    "excerpt_en": "Field notes from a family-home renovation on Bandung's northern slope.",
+    "category_id": "Proyek",
+    "category_en": "Project",
+    "date": "2026-07-12",
+    "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"
+  }
+]

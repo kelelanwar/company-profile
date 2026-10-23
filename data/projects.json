@@ -1,0 +1,162 @@
+[
+  {
+    "slug": "rumah-kubu-bandung",
+    "title_id": "Rumah Kubu Bandung",
+    "title_en": "Kubu House Bandung",
+    "category_id": "Interior residensial",
+    "category_en": "Residential interior",
+    "tags": ["interior", "residensial"],
+    "location": "Bandung",
+    "year": "2025",
+    "area": "240 m²",
+    "description_id": "Renovasi total rumah keluarga di lereng utara Bandung. Dinding lama dipertahankan, lalu dibuka selebar mungkin ke taman belakang agar cahaya sore masuk sampai ruang makan.",
+    "description_en": "A full renovation of a family home on Bandung's northern slope. The existing walls were kept, then opened as wide as possible toward the rear garden so afternoon light reaches the dining room.",
+    "images": [
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "modelUrl": null,
+    "poster": null
+  },
+  {
+    "slug": "loft-cipete",
+    "title_id": "Loft Cipete",
+    "title_en": "Cipete Loft",
+    "category_id": "Interior residensial",
+    "category_en": "Residential interior",
+    "tags": ["interior", "residensial"],
+    "location": "Jakarta",
+    "year": "2025",
+    "area": "118 m²",
+    "description_id": "Unit loft dua lantai dengan material beton ekspos dan baja. Fokus pengerjaan ada pada penyimpanan tersembunyi agar ruang tetap terasa lapang.",
+    "description_en": "A two-storey loft unit in exposed concrete and steel. The work focused on concealed storage so the space still feels open.",
+    "images": [
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1416331108676-a22ccb276e35?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "modelUrl": null,
+    "poster": null
+  },
+  {
+    "slug": "kantor-karsa",
+    "title_id": "Kantor Karsa Group",
+    "title_en": "Karsa Group Office",
+    "category_id": "Interior komersial",
+    "category_en": "Commercial interior",
+    "tags": ["interior", "komersial"],
+    "location": "Jakarta",
+    "year": "2024",
+    "area": "780 m²",
+    "description_id": "Ruang kerja dua lantai untuk 110 orang, dikerjakan bertahap per zona agar operasional tidak berhenti. Akustik dan pencahayaan menjadi prioritas utama.",
+    "description_en": "A two-floor workspace for 110 people, delivered zone by zone so operations never stopped. Acoustics and lighting were the top priorities.",
+    "images": [
+      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "modelUrl": null,
+    "poster": null
+  },
+  {
+    "slug": "kafe-bumi",
+    "title_id": "Kafe Bumi",
+    "title_en": "Bumi Coffee",
+    "category_id": "Hospitality",
+    "category_en": "Hospitality",
+    "tags": ["hospitality", "komersial"],
+    "location": "Bandung",
+    "year": "2024",
+    "area": "145 m²",
+    "description_id": "Kafe dengan bar terbuka dan area duduk bertingkat. Sebagian besar material berasal dari bengkel lokal di sekitar Bandung.",
+    "description_en": "A cafe with an open bar and tiered seating. Most materials came from workshops around Bandung.",
+    "images": [
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1554435493-93422e8220c8?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "modelUrl": null,
+    "poster": null
+  },
+  {
+    "slug": "villa-ubud",
+    "title_id": "Villa Ubud",
+    "title_en": "Ubud Villa",
+    "category_id": "Arsitektur hospitality",
+    "category_en": "Hospitality architecture",
+    "tags": ["arsitektur", "hospitality"],
+    "location": "Bali",
+    "year": "2023",
+    "area": "320 m²",
+    "description_id": "Tiga paviliun tidur yang menghadap lembah, dihubungkan koridor terbuka. Struktur utama memakai baja ringan agar bekas galian minim.",
+    "description_en": "Three sleeping pavilions facing the valley, linked by open corridors. The main structure uses light steel to minimize excavation.",
+    "images": [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "modelUrl": null,
+    "poster": null
+  },
+  {
+    "slug": "showroom-arc",
+    "title_id": "Showroom ARC",
+    "title_en": "ARC Showroom",
+    "category_id": "Interior komersial",
+    "category_en": "Commercial interior",
+    "tags": ["komersial", "interior"],
+    "location": "Surabaya",
+    "year": "2023",
+    "area": "410 m²",
+    "description_id": "Showroom material bangunan dengan jalur pengunjung melingkar. Sistem pencahayaan bisa diubah sesuai produk yang sedang dipamerkan.",
+    "description_en": "A building-materials showroom with a looping visitor route. The lighting system can be retuned for whichever product is on display.",
+    "images": [
+      "https://images.unsplash.com/photo-1503174971373-b1f69850bded?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1615529182904-14819c35db37?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "modelUrl": null,
+    "poster": null
+  },
+  {
+    "slug": "rumah-sintesa",
+    "title_id": "Rumah Sintesa",
+    "title_en": "Sintesa House",
+    "category_id": "Arsitektur residensial",
+    "category_en": "Residential architecture",
+    "tags": ["arsitektur", "residensial"],
+    "location": "Bandung",
+    "year": "2022",
+    "area": "305 m²",
+    "description_id": "Rumah dua massa dengan courtyard di tengah. Bukaan besar di kedua sisi membuat udara mengalir tanpa perlu pendingin di siang hari.",
+    "description_en": "A two-mass house with a central courtyard. Large openings on both sides keep air moving without mechanical cooling during the day.",
+    "images": [
+      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "modelUrl": null,
+    "poster": null
+  },
+  {
+    "slug": "studio-geost",
+    "title_id": "Studio Geost HQ",
+    "title_en": "Geost Studio HQ",
+    "category_id": "Interior & furniture",
+    "category_en": "Interior & furniture",
+    "tags": ["interior", "furniture"],
+    "location": "Bandung",
+    "year": "2022",
+    "area": "96 m²",
+    "description_id": "Studio kerja kami sendiri: meja gambar besar, perpustakaan material, dan bengkel kecil untuk prototipe furnitur.",
+    "description_en": "Our own workspace: a large drafting table, a material library, and a small workshop for furniture prototypes.",
+    "images": [
+      "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "modelUrl": null,
+    "poster": null
+  }
+]

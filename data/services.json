@@ -1,0 +1,44 @@
+[
+  {
+    "slug": "desain-interior",
+    "title_id": "Desain Interior",
+    "title_en": "Interior Design",
+    "summary_id": "Konsep, layout, dan pemilihan material untuk ruang residensial maupun komersial.",
+    "summary_en": "Concept, layout, and material selection for residential and commercial spaces."
+  },
+  {
+    "slug": "arsitektur-renovasi",
+    "title_id": "Arsitektur & Renovasi",
+    "title_en": "Architecture & Renovation",
+    "summary_id": "Perubahan struktur dan tampak bangunan, dari studi kelayakan sampai gambar kerja.",
+    "summary_en": "Structural and facade changes, from feasibility study to working drawings."
+  },
+  {
+    "slug": "konstruksi",
+    "title_id": "Konstruksi & Build",
+    "title_en": "Construction & Build",
+    "summary_id": "Pelaksanaan interior dengan tim sendiri, jadwal kerja mingguan, dan laporan biaya terbuka.",
+    "summary_en": "Interior construction with our own crew, weekly schedules, and open cost reporting."
+  },
+  {
+    "slug": "visualisasi-3d",
+    "title_id": "Visualisasi 3D & 360°",
+    "title_en": "3D & 360° Visualization",
+    "summary_id": "Render foto-realistis dan tur 360° interaktif dari model SketchUp Anda.",
+    "summary_en": "Photo-real renders and interactive 360° tours built from your SketchUp model."
+  },
+  {
+    "slug": "furniture-custom",
+    "title_id": "Furniture Custom",
+    "title_en": "Custom Furniture",
+    "summary_id": "Furnitur yang digambar mengikuti ukuran ruang, diproduksi di bengkel lokal.",
+    "summary_en": "Furniture drawn to the exact dimensions of the room and built in local workshops."
+  },
+  {
+    "slug": "konsultasi",
+    "title_id": "Konsultasi & Perencanaan",
+    "title_en": "Consulting & Planning",
+    "summary_id": "Sesi 30 menit untuk memetakan lingkup, anggaran, dan urutan pekerjaan.",
+    "summary_en": "A 30-minute session to map scope, budget, and the order of work."
+  }
+]

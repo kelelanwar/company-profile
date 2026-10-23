@@ -1,0 +1,337 @@
+{
+  "meta": {
+    "siteName": "Geost Studio",
+    "tagline": "Interior design & architecture studio",
+    "home": {
+      "title": "Geost Studio — Interior Design, Architecture & 360° Visualization",
+      "description": "An interior design and build studio in Bandung. Explore the 360° portfolio, then preview an AI concept for the space you want to build."
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "projects": "Projects",
+    "pricing": "Pricing",
+    "preview": "AI Preview",
+    "contact": "Contact",
+    "cta": "Start a project",
+    "menu": "Open menu",
+    "close": "Close menu",
+    "primary": "Main navigation",
+    "language": "Language"
+  },
+  "common": {
+    "all": "All",
+    "viewAll": "View all",
+    "viewProject": "View project",
+    "consult": "Chat on WhatsApp",
+    "emailUs": "Send an email",
+    "backHome": "Back to home",
+    "loading": "Loading…",
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "The link you opened has moved or never existed.",
+    "skipToContent": "Skip to content"
+  },
+  "taxonomy": {
+    "tags": {
+      "interior": "Interior",
+      "arsitektur": "Architecture",
+      "komersial": "Commercial",
+      "residensial": "Residential",
+      "hospitality": "Hospitality",
+      "furniture": "Furniture"
+    }
+  },
+  "home": {
+    "hero": {
+      "slides": [
+        {
+          "eyebrow": "Interior · Architecture · Construction",
+          "title": "Spaces designed to be lived in, not just photographed.",
+          "description": "Geost Studio designs, builds, and visualizes residential and commercial interiors — with details you can explore from every angle.",
+          "imageAlt": "Living room with warm lighting and timber surfaces",
+          "primaryCta": "Start a project",
+          "secondaryCta": "See the portfolio"
+        },
+        {
+          "eyebrow": "360° Portfolio",
+          "title": "Walk every corner before a single brick is laid.",
+          "description": "Interactive 3D models let you move through the space, read the proportions, and approve the design without having to imagine it.",
+          "imageAlt": "Workspace interior with large windows and a concrete wall",
+          "primaryCta": "Try the 360° viewer",
+          "secondaryCta": "Talk to us first"
+        }
+      ],
+      "prev": "Previous slide",
+      "next": "Next slide",
+      "slideLabel": "Slide"
+    },
+    "statsLabel": "Key figures",
+    "stats": [
+      { "value": "12", "label": "Years of practice" },
+      { "value": "120+", "label": "Completed projects" },
+      { "value": "38", "label": "Corporate clients" },
+      { "value": "360°", "label": "Interactive visualization" }
+    ],
+    "about": {
+      "eyebrow": "About Geost",
+      "title": "A small studio with uncompromising attention to detail.",
+      "body": "We started from one simple belief: the best design decisions happen when drawings, costs, and materials sit on the same table. That is why Geost designers, estimators, and site supervisors work as one team — one process, one owner.",
+      "bodySecondary": "Every project starts by reading how you actually use a room, not by chasing trends. The result is a space that feels right from the first day you live in it.",
+      "points": [
+        "Design and construction under one roof",
+        "3D and 360° visualization before execution",
+        "Local materials with premium finishing standards"
+      ],
+      "imageAlt": "The Geost Studio team reviewing construction drawings",
+      "imageAltSecondary": "Detail of a timber joint on Geost bespoke furniture",
+      "cta": "See how we work"
+    },
+    "services": {
+      "eyebrow": "Services",
+      "title": "Six ways we take on your space.",
+      "description": "From the first sketch to handing over the keys — one workflow, one point of accountability.",
+      "cta": "View all services"
+    },
+    "highlight360": {
+      "eyebrow": "360° Portfolio",
+      "title": "Orbit, zoom, and inspect the space from inside.",
+      "description": "We convert SketchUp models into lightweight 3D tours that run in the browser with no extra app. Orbit the room, check circulation, and measure furniture proportions before production begins.",
+      "bullets": [
+        "Runs on mobile and desktop",
+        "Orbit, zoom, and reset controls",
+        "Photo gallery fallback when a model is not ready"
+      ],
+      "hint": "Drag to orbit · Pinch to zoom",
+      "cta": "Explore 360° projects"
+    },
+    "projects": {
+      "eyebrow": "Selected work",
+      "title": "Work you can explore.",
+      "description": "Eight recent projects, filtered by typology. Open a detail page to see the gallery and the 360° model.",
+      "cta": "View all projects"
+    },
+    "pricing": {
+      "eyebrow": "Packages",
+      "title": "Transparent pricing, clear scope.",
+      "description": "Three packages for three scales of need. Every package includes a free initial consultation.",
+      "note": "Prices exclude VAT and construction cost. Construction estimates are issued separately once working drawings are approved.",
+      "tiers": [
+        {
+          "name": "Studio",
+          "price": "IDR 4.5M",
+          "unit": "/ room",
+          "summary": "For a single room that needs a complete rework.",
+          "features": [
+            "Design concept + moodboard",
+            "2 layout alternatives",
+            "4-view 3D renders",
+            "Cost breakdown & material spec",
+            "1 major revision"
+          ],
+          "cta": "Choose Studio",
+          "badge": "",
+          "featured": false
+        },
+        {
+          "name": "Project",
+          "price": "IDR 18M",
+          "unit": "/ package",
+          "summary": "For a mid-sized home or office.",
+          "features": [
+            "Everything in Studio",
+            "Interactive 360° visualization",
+            "Working drawings & construction details",
+            "Contractor tender support",
+            "3 major revisions",
+            "8 weeks of site supervision"
+          ],
+          "cta": "Choose Project",
+          "badge": "Most chosen",
+          "featured": true
+        },
+        {
+          "name": "Enterprise",
+          "price": "Custom",
+          "unit": "/ contract",
+          "summary": "For commercial buildings, hospitality, and multi-unit.",
+          "features": [
+            "Everything in Project",
+            "Dedicated project team",
+            "Full construction management",
+            "Tender & contract documents",
+            "Revisions within agreed scope",
+            "12-month post-handover warranty"
+          ],
+          "cta": "Discuss your needs",
+          "badge": "",
+          "featured": false
+        }
+      ]
+    },
+    "team": {
+      "eyebrow": "Team",
+      "title": "The people who draw it and build it.",
+      "description": "Three disciplines, one worktable. You speak with the same people from concept to handover."
+    },
+    "testimonials": {
+      "eyebrow": "Client words",
+      "title": "What changed once the space was finished.",
+      "items": [
+        {
+          "quote": "Geost reworked our office ground floor without stopping operations. The 360° render was the clincher — the board approved it in a single session.",
+          "name": "Rani Kusuma",
+          "role": "COO, Karsa Group"
+        },
+        {
+          "quote": "I expected endless revisions. Instead the cost estimate and the working drawings matched, so there were no surprises during construction.",
+          "name": "Dimas Hartono",
+          "role": "Founder, Ruang Kerja"
+        },
+        {
+          "quote": "The timber detailing and lighting are immaculate. The house feels larger than the floor plan I had imagined.",
+          "name": "Sinta Maharani",
+          "role": "Homeowner, Bandung"
+        }
+      ]
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "What clients usually ask first.",
+      "items": [
+        {
+          "q": "Can I see the design before construction starts?",
+          "a": "Yes. You receive 3D renders, a layout plan, and — on Project packages and above — a 360° model you can orbit right in the browser."
+        },
+        {
+          "q": "How long does it take from design to handover?",
+          "a": "A single room usually takes 3–5 weeks of design, followed by 6–10 weeks of construction depending on scope and material availability."
+        },
+        {
+          "q": "Does Geost also handle construction?",
+          "a": "Yes. We build interiors with our own crew and regular subcontractors, so design intent and execution stay with one accountable team."
+        },
+        {
+          "q": "How does the AI preview work?",
+          "a": "You upload a photo of the room and describe what you want. The system generates a concept image as an early discussion reference — not a final construction result."
+        },
+        {
+          "q": "Do you work outside Bandung?",
+          "a": "Yes. For Jakarta, Bali, and Surabaya projects we schedule periodic site visits. Travel costs are quoted separately."
+        }
+      ]
+    },
+    "news": {
+      "eyebrow": "Studio notes",
+      "title": "What we are learning and building.",
+      "description": "Short notes on materials, process, and projects in progress.",
+      "cta": "Read the notes"
+    },
+    "cta": {
+      "title": "Have a space that needs rethinking?",
+      "description": "Send a photo of the room, tell us what you need, and we will reply with the next step within one business day.",
+      "primary": "Chat on WhatsApp",
+      "secondary": "See pricing"
+    }
+  },
+  "pages": {
+    "projects": {
+      "eyebrow": "Portfolio",
+      "title": "Projects we have built.",
+      "description": "Filter by typology to see how we approach residential, commercial, and hospitality spaces."
+    },
+    "projectDetail": {
+      "back": "All projects",
+      "overview": "Overview",
+      "location": "Location",
+      "year": "Year",
+      "area": "Area",
+      "category": "Category",
+      "gallery": "Gallery",
+      "viewerNotice": "The 360° model for this project is being prepared. In the meantime, explore the photo gallery below.",
+      "ctaTitle": "Want a space handled this way?",
+      "ctaBody": "We can start from a photo of your room and one short conversation.",
+      "ctaPrimary": "Start a similar project"
+    },
+    "services": {
+      "eyebrow": "Services",
+      "title": "One team, from sketch to handover.",
+      "description": "Pick the entry point that fits you — design only, design plus build, or full support.",
+      "ctaTitle": "Not sure where to start?",
+      "ctaBody": "A free 30-minute consultation to map the scope and budget."
+    },
+    "pricing": {
+      "eyebrow": "Pricing",
+      "title": "Three packages, one build standard.",
+      "description": "The scope of every package is written into the contract up front. No surprise costs halfway through."
+    },
+    "about": {
+      "eyebrow": "About",
+      "title": "We draw it, cost it, then build it ourselves.",
+      "description": "Geost Studio has been based in Bandung since 2014. We handle residential interiors, workspaces, and hospitality with a core team of nine.",
+      "valuesTitle": "How we work",
+      "values": [
+        { "title": "One table, three disciplines", "body": "Designer, estimator, and site supervisor sit in one team so decisions never stall." },
+        { "title": "Drawings you can build from", "body": "Every detail is drawn down to the joint, not just the atmosphere." },
+        { "title": "Open costs", "body": "The cost breakdown is itemized so you know where the budget goes." }
+      ]
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "title": "Tell us about the space you want to change.",
+      "description": "WhatsApp is the fastest reply. For documents, drawings, or briefs, use email.",
+      "whatsappLabel": "WhatsApp",
+      "whatsappNote": "Monday–Friday, 09.00–18.00 WIB",
+      "emailLabel": "Email",
+      "emailNote": "For briefs, drawings, and documents",
+      "studioLabel": "Studio",
+      "studioNote": "Visits by appointment",
+      "formTitle": "Or leave a short brief",
+      "formNote": "This form opens your email app with the message pre-filled.",
+      "formName": "Name",
+      "formEmail": "Email",
+      "formMessage": "What you need",
+      "formSubmit": "Send brief"
+    },
+    "preview": {
+      "eyebrow": "AI Preview",
+      "title": "See what your room could become, in seconds.",
+      "description": "Upload a photo of your room, describe the direction you want, and get a concept image to start the conversation.",
+      "steps": [
+        { "title": "Upload a photo", "body": "Use a bright, clear photo of the room, JPG/PNG/WebP up to 5 MB." },
+        { "title": "Describe it", "body": "For example: “industrial living room, brick wall, warm lighting”." },
+        { "title": "Discuss the result", "body": "Bring it to WhatsApp so we can translate it into a real design." }
+      ],
+      "notice": "AI preview is a concept only, not a final construction result. Proportions, materials, and costs are still decided by technical design.",
+      "statusTitle": "The preview studio is being prepared",
+      "statusBody": "The upload form and AI results go live in the next milestone. For now, send your room photo over WhatsApp and we will follow up faster.",
+      "cta": "Send a photo on WhatsApp"
+    }
+  },
+  "footer": {
+    "tagline": "An interior design, architecture, and 360° visualization studio based in Bandung.",
+    "studioLabel": "Studio",
+    "address": "Jl. Cihampelas No. 120, Bandung, West Java 40131",
+    "phoneLabel": "WhatsApp",
+    "emailLabel": "Email",
+    "hours": "Monday–Friday, 09.00–18.00 WIB",
+    "companyTitle": "Company",
+    "links": {
+      "about": "About",
+      "services": "Services",
+      "projects": "Projects",
+      "pricing": "Pricing",
+      "contact": "Contact"
+    },
+    "servicesTitle": "Services",
+    "newsletterTitle": "The monthly Geost note",
+    "newsletterBody": "One email a month: materials, new projects, and site notes.",
+    "newsletterPlaceholder": "you@example.com",
+    "newsletterSubmit": "Subscribe",
+    "newsletterNote": "No spam. Unsubscribe anytime.",
+    "rights": "© 2026 Geost Studio. All rights reserved.",
+    "privacy": "Privacy policy",
+    "terms": "Terms of service"
+  }
+}

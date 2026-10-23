@@ -1,0 +1,337 @@
+{
+  "meta": {
+    "siteName": "Geost Studio",
+    "tagline": "Studio desain interior & arsitektur",
+    "home": {
+      "title": "Geost Studio — Desain Interior, Arsitektur & Visualisasi 360°",
+      "description": "Studio desain dan konstruksi interior di Bandung. Jelajahi portofolio 360°, lalu lihat pratinjau konsep AI untuk ruang yang ingin Anda bangun."
+    }
+  },
+  "nav": {
+    "home": "Beranda",
+    "about": "Tentang",
+    "services": "Layanan",
+    "projects": "Proyek",
+    "pricing": "Harga",
+    "preview": "Pratinjau AI",
+    "contact": "Kontak",
+    "cta": "Mulai proyek",
+    "menu": "Buka menu",
+    "close": "Tutup menu",
+    "primary": "Navigasi utama",
+    "language": "Bahasa"
+  },
+  "common": {
+    "all": "Semua",
+    "viewAll": "Lihat semua",
+    "viewProject": "Lihat proyek",
+    "consult": "Konsultasi via WhatsApp",
+    "emailUs": "Kirim email",
+    "backHome": "Kembali ke beranda",
+    "loading": "Memuat…",
+    "notFoundTitle": "Halaman tidak ditemukan",
+    "notFoundBody": "Tautan yang Anda buka sudah dipindahkan atau tidak pernah ada.",
+    "skipToContent": "Lewati ke konten"
+  },
+  "taxonomy": {
+    "tags": {
+      "interior": "Interior",
+      "arsitektur": "Arsitektur",
+      "komersial": "Komersial",
+      "residensial": "Residensial",
+      "hospitality": "Hospitality",
+      "furniture": "Furniture"
+    }
+  },
+  "home": {
+    "hero": {
+      "slides": [
+        {
+          "eyebrow": "Interior · Arsitektur · Konstruksi",
+          "title": "Ruang yang dirancang untuk hidup, bukan hanya untuk difoto.",
+          "description": "Geost Studio merancang, membangun, dan memvisualisasikan interior residensial serta komersial — dengan detail yang bisa Anda jelajahi dari segala sudut.",
+          "imageAlt": "Ruang tamu dengan pencahayaan hangat dan material kayu",
+          "primaryCta": "Mulai proyek",
+          "secondaryCta": "Lihat portofolio"
+        },
+        {
+          "eyebrow": "Portofolio 360°",
+          "title": "Jelajahi setiap sudut sebelum satu batu pun dipasang.",
+          "description": "Model 3D interaktif memungkinkan Anda berkeliling ruang, membaca proporsi, dan menyetujui desain tanpa harus membayangkan.",
+          "imageAlt": "Interior ruang kerja dengan jendela besar dan dinding beton",
+          "primaryCta": "Coba viewer 360°",
+          "secondaryCta": "Konsultasi dulu"
+        }
+      ],
+      "prev": "Slide sebelumnya",
+      "next": "Slide berikutnya",
+      "slideLabel": "Slide"
+    },
+    "statsLabel": "Angka kunci",
+    "stats": [
+      { "value": "12", "label": "Tahun praktik" },
+      { "value": "120+", "label": "Proyek selesai" },
+      { "value": "38", "label": "Klien korporat" },
+      { "value": "360°", "label": "Visualisasi interaktif" }
+    ],
+    "about": {
+      "eyebrow": "Tentang Geost",
+      "title": "Studio kecil dengan standar detail yang tidak kecil.",
+      "body": "Kami memulai dari satu keyakinan sederhana: keputusan desain terbaik lahir saat gambar, biaya, dan material dibicarakan di meja yang sama. Karena itu desainer, estimator, dan pengawas lapangan Geost bekerja dalam satu tim — satu alur, satu tanggung jawab.",
+      "bodySecondary": "Setiap proyek dimulai dengan membaca cara Anda memakai ruang, bukan dengan tren. Hasilnya ruang yang terasa tepat sejak hari pertama Anda tinggal di dalamnya.",
+      "points": [
+        "Desain dan konstruksi dalam satu atap",
+        "Visualisasi 3D & 360° sebelum eksekusi",
+        "Material lokal dengan standar finishing premium"
+      ],
+      "imageAlt": "Tim Geost Studio sedang meninjau gambar kerja di studio",
+      "imageAltSecondary": "Detail sambungan kayu pada furnitur buatan Geost",
+      "cta": "Kenali cara kerja kami"
+    },
+    "services": {
+      "eyebrow": "Layanan",
+      "title": "Enam cara kami mengerjakan ruang Anda.",
+      "description": "Dari sketsa awal sampai serah terima kunci — satu alur kerja, satu penanggung jawab.",
+      "cta": "Lihat semua layanan"
+    },
+    "highlight360": {
+      "eyebrow": "Portofolio 360°",
+      "title": "Putar, zoom, dan periksa ruang dari dalam.",
+      "description": "Kami mengubah model SketchUp menjadi tur 3D ringan yang berjalan di browser tanpa aplikasi tambahan. Anda bisa mengorbit ruang, memeriksa sirkulasi, dan mengukur proporsi furnitur sebelum produksi dimulai.",
+      "bullets": [
+        "Berjalan di ponsel dan desktop",
+        "Kontrol orbit, zoom, dan reset tampilan",
+        "Fallback galeri foto bila model belum siap"
+      ],
+      "hint": "Tarik untuk memutar · Cubit untuk memperbesar",
+      "cta": "Jelajahi proyek 360°"
+    },
+    "projects": {
+      "eyebrow": "Proyek pilihan",
+      "title": "Karya yang bisa Anda jelajahi.",
+      "description": "Delapan proyek terakhir, difilter berdasarkan tipologi. Buka detail untuk melihat galeri dan model 360°.",
+      "cta": "Lihat semua proyek"
+    },
+    "pricing": {
+      "eyebrow": "Paket",
+      "title": "Harga transparan, lingkup jelas.",
+      "description": "Tiga paket untuk tiga skala kebutuhan. Semua paket mencakup konsultasi awal tanpa biaya.",
+      "note": "Harga belum termasuk PPN dan biaya konstruksi. Estimasi konstruksi diberikan terpisah setelah gambar kerja disetujui.",
+      "tiers": [
+        {
+          "name": "Studio",
+          "price": "Rp 4,5 jt",
+          "unit": "/ ruang",
+          "summary": "Untuk satu ruang yang ingin dirombak total.",
+          "features": [
+            "Konsep desain + moodboard",
+            "2 alternatif layout",
+            "Render 3D 4 sudut pandang",
+            "RAB & spesifikasi material",
+            "1x revisi mayor"
+          ],
+          "cta": "Pilih Studio",
+          "badge": "",
+          "featured": false
+        },
+        {
+          "name": "Proyek",
+          "price": "Rp 18 jt",
+          "unit": "/ paket",
+          "summary": "Untuk rumah atau kantor skala menengah.",
+          "features": [
+            "Semua yang ada di Studio",
+            "Visualisasi 360° interaktif",
+            "Gambar kerja & detail konstruksi",
+            "Pendampingan tender kontraktor",
+            "3x revisi mayor",
+            "Supervisi 8 minggu"
+          ],
+          "cta": "Pilih Proyek",
+          "badge": "Paling dipilih",
+          "featured": true
+        },
+        {
+          "name": "Enterprise",
+          "price": "Custom",
+          "unit": "/ kontrak",
+          "summary": "Untuk gedung komersial, hospitality, dan multi-unit.",
+          "features": [
+            "Semua yang ada di Proyek",
+            "Tim proyek khusus",
+            "Manajemen konstruksi penuh",
+            "Dokumen tender & kontrak",
+            "Revisi sesuai lingkup kesepakatan",
+            "Garansi purna jual 12 bulan"
+          ],
+          "cta": "Diskusikan kebutuhan",
+          "badge": "",
+          "featured": false
+        }
+      ]
+    },
+    "team": {
+      "eyebrow": "Tim",
+      "title": "Orang-orang yang menggambar dan membangunnya.",
+      "description": "Tiga disiplin, satu meja kerja. Anda berbicara dengan orang yang sama dari konsep sampai serah terima."
+    },
+    "testimonials": {
+      "eyebrow": "Kata klien",
+      "title": "Yang berubah setelah ruangnya selesai.",
+      "items": [
+        {
+          "quote": "Tim Geost mengubah lantai dasar kantor kami tanpa menghentikan operasional. Yang paling membantu: render 360° membuat rapat persetujuan direksi selesai dalam satu sesi.",
+          "name": "Rani Kusuma",
+          "role": "COO, Karsa Group"
+        },
+        {
+          "quote": "Saya mengira proses desain akan penuh revisi. Ternyata estimasi biaya dan gambar kerjanya konsisten, jadi tidak ada kejutan saat konstruksi.",
+          "name": "Dimas Hartono",
+          "role": "Founder, Ruang Kerja"
+        },
+        {
+          "quote": "Detail pengerjaan kayu dan pencahayaannya rapi. Rumah terasa lebih luas dari denah yang saya bayangkan sebelumnya.",
+          "name": "Sinta Maharani",
+          "role": "Pemilik Rumah, Bandung"
+        }
+      ]
+    },
+    "faq": {
+      "eyebrow": "Pertanyaan",
+      "title": "Hal yang biasanya ditanyakan lebih dulu.",
+      "items": [
+        {
+          "q": "Apakah saya bisa melihat desain sebelum konstruksi dimulai?",
+          "a": "Bisa. Anda menerima render 3D, denah layout, dan untuk paket Proyek ke atas sebuah model 360° yang dapat diputar langsung di browser."
+        },
+        {
+          "q": "Berapa lama proses dari desain sampai serah terima?",
+          "a": "Satu ruang biasanya 3–5 minggu untuk desain, lalu 6–10 minggu konstruksi tergantung lingkup dan ketersediaan material."
+        },
+        {
+          "q": "Apakah Geost juga mengerjakan konstruksi?",
+          "a": "Ya. Kami mengerjakan konstruksi interior dengan tim sendiri dan subkontraktor tetap, sehingga tanggung jawab desain dan eksekusi tidak terpisah."
+        },
+        {
+          "q": "Bagaimana cara kerja pratinjau AI?",
+          "a": "Anda mengunggah foto ruangan dan menuliskan keinginan Anda. Sistem membuat gambar konsep sebagai bahan diskusi awal — bukan hasil akhir konstruksi."
+        },
+        {
+          "q": "Apakah melayani proyek di luar Bandung?",
+          "a": "Ya, untuk proyek Jakarta, Bali, dan Surabaya kami bekerja dengan jadwal survei berkala. Biaya perjalanan dihitung terpisah."
+        }
+      ]
+    },
+    "news": {
+      "eyebrow": "Catatan studio",
+      "title": "Yang sedang kami pelajari dan kerjakan.",
+      "description": "Catatan pendek soal material, proses, dan proyek yang sedang berjalan.",
+      "cta": "Baca catatan"
+    },
+    "cta": {
+      "title": "Punya ruang yang perlu dipikirkan ulang?",
+      "description": "Kirim foto ruangan Anda, ceritakan kebutuhannya, dan kami balas dengan langkah berikutnya dalam 1x24 jam kerja.",
+      "primary": "Konsultasi via WhatsApp",
+      "secondary": "Lihat paket harga"
+    }
+  },
+  "pages": {
+    "projects": {
+      "eyebrow": "Portofolio",
+      "title": "Proyek yang sudah kami bangun.",
+      "description": "Filter berdasarkan tipologi untuk melihat cara kami menangani ruang residensial, komersial, dan hospitality."
+    },
+    "projectDetail": {
+      "back": "Semua proyek",
+      "overview": "Ringkasan",
+      "location": "Lokasi",
+      "year": "Tahun",
+      "area": "Luas",
+      "category": "Kategori",
+      "gallery": "Galeri",
+      "viewerNotice": "Model 360° untuk proyek ini sedang disiapkan. Sementara itu, jelajahi galeri foto di bawah.",
+      "ctaTitle": "Ingin ruang dengan pendekatan seperti ini?",
+      "ctaBody": "Kami bisa mulai dari foto ruangan Anda dan satu percakapan singkat.",
+      "ctaPrimary": "Mulai proyek serupa"
+    },
+    "services": {
+      "eyebrow": "Layanan",
+      "title": "Satu tim, dari sketsa sampai serah terima.",
+      "description": "Pilih titik masuk sesuai kebutuhan Anda — desain saja, desain plus konstruksi, atau pendampingan penuh.",
+      "ctaTitle": "Belum yakin mulai dari mana?",
+      "ctaBody": "Konsultasi awal 30 menit tanpa biaya untuk memetakan lingkup dan anggaran."
+    },
+    "pricing": {
+      "eyebrow": "Harga",
+      "title": "Tiga paket, satu standar pengerjaan.",
+      "description": "Lingkup setiap paket ditulis jelas di awal kontrak. Tidak ada biaya kejutan di tengah jalan."
+    },
+    "about": {
+      "eyebrow": "Tentang",
+      "title": "Kami menggambar, menghitung, lalu membangunnya sendiri.",
+      "description": "Geost Studio berdiri sejak 2014 di Bandung. Kami menangani interior residensial, ruang kerja, dan hospitality dengan tim inti 9 orang.",
+      "valuesTitle": "Cara kami bekerja",
+      "values": [
+        { "title": "Satu meja, tiga disiplin", "body": "Desainer, estimator, dan pengawas duduk dalam satu tim agar keputusan tidak tertunda." },
+        { "title": "Gambar yang bisa dibangun", "body": "Setiap detail digambar sampai sambungan, bukan hanya suasana." },
+        { "title": "Biaya terbuka", "body": "RAB dirinci per item sehingga Anda tahu ke mana anggaran pergi." }
+      ]
+    },
+    "contact": {
+      "eyebrow": "Kontak",
+      "title": "Ceritakan ruang yang ingin Anda ubah.",
+      "description": "Balasan tercepat lewat WhatsApp. Untuk dokumen, gambar, atau brief, kirim lewat email.",
+      "whatsappLabel": "WhatsApp",
+      "whatsappNote": "Senin–Jumat, 09.00–18.00 WIB",
+      "emailLabel": "Email",
+      "emailNote": "Untuk brief, gambar, dan dokumen",
+      "studioLabel": "Studio",
+      "studioNote": "Kunjungan dengan janji terlebih dahulu",
+      "formTitle": "Atau tinggalkan brief singkat",
+      "formNote": "Form ini membuka aplikasi email Anda dengan isi yang sudah terisi.",
+      "formName": "Nama",
+      "formEmail": "Email",
+      "formMessage": "Kebutuhan Anda",
+      "formSubmit": "Kirim brief"
+    },
+    "preview": {
+      "eyebrow": "Pratinjau AI",
+      "title": "Lihat kemungkinan ruang Anda dalam hitungan detik.",
+      "description": "Unggah foto ruangan, tuliskan arah desain yang Anda inginkan, dan dapatkan gambar konsep sebagai bahan diskusi awal.",
+      "steps": [
+        { "title": "Unggah foto", "body": "Gunakan foto ruangan yang terang, JPG/PNG/WebP maksimal 5 MB." },
+        { "title": "Tulis arahan", "body": "Contoh: “ruang tamu industrial, dinding bata, pencahayaan hangat”." },
+        { "title": "Diskusikan hasilnya", "body": "Bawa hasilnya ke WhatsApp kami untuk diterjemahkan menjadi desain nyata." }
+      ],
+      "notice": "Pratinjau AI hanya konsep, bukan hasil akhir konstruksi. Proporsi, material, dan biaya tetap ditentukan oleh desain teknis.",
+      "statusTitle": "Studio pratinjau sedang disiapkan",
+      "statusBody": "Form unggah dan hasil AI aktif pada tahap berikutnya. Sementara ini, kirim foto ruangan Anda lewat WhatsApp agar kami bisa menindaklanjuti lebih cepat.",
+      "cta": "Kirim foto via WhatsApp"
+    }
+  },
+  "footer": {
+    "tagline": "Studio desain interior, arsitektur, dan visualisasi 360° yang berbasis di Bandung.",
+    "studioLabel": "Studio",
+    "address": "Jl. Cihampelas No. 120, Bandung, Jawa Barat 40131",
+    "phoneLabel": "WhatsApp",
+    "emailLabel": "Email",
+    "hours": "Senin–Jumat, 09.00–18.00 WIB",
+    "companyTitle": "Perusahaan",
+    "links": {
+      "about": "Tentang",
+      "services": "Layanan",
+      "projects": "Proyek",
+      "pricing": "Harga",
+      "contact": "Kontak"
+    },
+    "servicesTitle": "Layanan",
+    "newsletterTitle": "Catatan bulanan Geost",
+    "newsletterBody": "Satu email per bulan: material, proyek baru, dan catatan lapangan.",
+    "newsletterPlaceholder": "email@anda.com",
+    "newsletterSubmit": "Berlangganan",
+    "newsletterNote": "Tanpa spam. Berhenti kapan saja.",
+    "rights": "© 2026 Geost Studio. Seluruh hak cipta dilindungi.",
+    "privacy": "Kebijakan privasi",
+    "terms": "Syarat layanan"
+  }
+}
