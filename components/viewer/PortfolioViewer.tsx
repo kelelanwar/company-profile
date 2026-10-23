@@ -3,7 +3,6 @@
 import { OrbitControls, useProgress } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import {
-  Component,
   Suspense,
   useCallback,
   useEffect,
@@ -16,6 +15,7 @@ import { Vector3 } from "three";
 import type { Dictionary } from "@/lib/i18n";
 import { ModelScene } from "./ModelScene";
 import { RoomScene } from "./RoomScene";
+import { ViewerErrorBoundary } from "./ViewerErrorBoundary";
 
 type Props = {
   dict: Dictionary["viewer"];
@@ -29,42 +29,6 @@ const DEMO_CAMERA: [number, number, number] = [5.1, 5, -6.1];
 const DEMO_TARGET: [number, number, number] = [0, 0.85, 0];
 const MODEL_CAMERA: [number, number, number] = [3.6, 2.6, 4.8];
 const MODEL_TARGET: [number, number, number] = [0, 0.4, 0];
-
-type ViewerErrorBoundaryProps = {
-  title: string;
-  body: string;
-  children: ReactNode;
-};
-
-type ViewerErrorBoundaryState = { failed: boolean };
-
-class ViewerErrorBoundary extends Component<
-  ViewerErrorBoundaryProps,
-  ViewerErrorBoundaryState
-> {
-  state: ViewerErrorBoundaryState = { failed: false };
-
-  static getDerivedStateFromError(): ViewerErrorBoundaryState {
-    return { failed: true };
-  }
-
-  render() {
-    if (this.state.failed) {
-      return (
-        <div className="absolute inset-0 grid place-items-center bg-carbone px-6 text-center">
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-copper">
-              {this.props.title}
-            </p>
-            <p className="mt-3 max-w-sm text-sm text-muted">{this.props.body}</p>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
 
 export function PortfolioViewer({ dict, modelUrl, demoScene = false }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -124,6 +88,7 @@ export function PortfolioViewer({ dict, modelUrl, demoScene = false }: Props) {
       role="group"
       aria-label={dict.canvasLabel}
       aria-describedby={hintId}
+      data-viewer={isDemo ? "room-demo" : "model"}
       className={`relative isolate overflow-hidden border border-line bg-carbone ${
         isFullscreen ? "h-svh w-svw" : "aspect-[4/3] md:aspect-[16/9]"
       }`}

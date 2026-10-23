@@ -6,6 +6,7 @@ import { getDictionary, pick, type Locale } from "@/lib/i18n";
 import { btnGhost, btnPrimary } from "@/lib/styles";
 import { mailtoUrl, whatsappUrl } from "@/lib/site";
 import { PortfolioViewer } from "@/components/viewer/PortfolioViewer";
+import { PanoramaGallery } from "@/components/viewer/PanoramaGallery";
 
 type DetailProps = {
   locale: Locale;
@@ -87,6 +88,27 @@ export async function ProjectDetail({ locale, project }: DetailProps) {
               {dict.viewer.demoNote}
             </p>
           ) : null}
+        </section>
+      ) : null}
+
+      {project.panoramas?.length ? (
+        <section className="shell pt-14 md:pt-16">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <p className="eyebrow">{dict.viewer.panoramaTitle}</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+              {dict.viewer.panoramaBadge}
+            </p>
+          </div>
+          <PanoramaGallery
+            panoramas={project.panoramas}
+            locale={locale}
+            dict={dict.viewer}
+          />
+          <p className="mt-3 max-w-2xl text-xs leading-relaxed text-muted/80">
+            {project.panoramaDemo
+              ? dict.viewer.panoramaDemoNote
+              : dict.viewer.panoramaNote}
+          </p>
         </section>
       ) : null}
 

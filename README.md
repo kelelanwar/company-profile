@@ -52,9 +52,10 @@ Verify `lint -> typecheck -> build` before opening a PR.
 ## Editing content
 
 - **Projects** — add an entry to `data/projects.json` (`slug`, `title_id`,
-  `title_en`, `tags`, `images[]`, `modelUrl`, optional `demoScene`). Cards and
-  the detail page follow automatically; add `modelUrl: "/models/<slug>.glb"`
-  once a real model exists, or `demoScene: true` to show the Kenney demo room.
+  `title_en`, `tags`, `images[]`, `modelUrl`, `panoramas[]`, optional
+  `demoScene` / `panoramaDemo`). Cards and the detail page follow automatically;
+  add `modelUrl: "/models/<slug>.glb"` once a real model exists, or
+  `demoScene: true` to show the Kenney demo room.
 - **Services / team / notes** — `data/services.json`, `data/team.json`,
   `data/news.json`.
 - **Pricing, FAQ, testimonials, hero slides** — `messages/*.json` under `home`.
@@ -62,7 +63,8 @@ Verify `lint -> typecheck -> build` before opening a PR.
 ## 360° viewer
 
 The viewer lives in `components/viewer/` and renders on project detail pages
-when a project has `modelUrl` (real model) or `demoScene: true` (demo room).
+when a project has `modelUrl` (real model), `demoScene: true` (demo room), or
+`panoramas` (equirectangular photos).
 
 ### Demo room (ships now)
 
@@ -91,24 +93,53 @@ Each piece is `{ model, position: [x, y, z], rotationY?, scale? }` in kit units
 3. Set `"modelUrl": "/models/<slug>.glb"` on the project entry. `ModelScene`
    centers and scales the model automatically.
 
+### 360° panorama (equirectangular photo)
+
+A separate viewer for photos shot with a 360 camera or phone panorama mode:
+drag to look around, pinch/scroll to zoom, slow auto-rotate (disabled for
+`prefers-reduced-motion`), reset, fullscreen.
+
+1. Use a **2:1 equirectangular** image, e.g. 4096x2048, JPEG under ~300 KB
+   (`node scripts/to-jpeg.mjs in.png out.jpg 0.82` converts/resizes).
+2. Save it as `public/images/panoramas/<slug>-<room>-360.jpg`.
+3. Add it to the project in `data/projects.json`:
+
+```json
+"panoramas": [
+  { "image": "/images/panoramas/kubu-living-360.jpg",
+    "label_id": "Ruang tamu", "label_en": "Living room",
+    "credit": "Foto: tim Geost" }
+]
+```
+
+Several panoramas become tabs above the viewer. Remove `"panoramaDemo": true`
+once the photos are real project shots.
+
+The two sample panoramas (`loft-living-360.jpg`, `loft-lounge-360.jpg`) are
+tonemapped previews from [Poly Haven](https://polyhaven.com) (CC0) and are
+labelled as demo content in the UI — replace them before launch.
+
 ### Viewer rules
 
 - `"use client"`, `<Suspense>`, `dpr={[1,2]}`, `OrbitControls` with autoRotate
-  and zoom, reset + fullscreen + keyboard-friendly rotate buttons.
+  and zoom for 3D models, pointer-drag look controls for panoramas, plus reset,
+  fullscreen, and keyboard-friendly turn buttons.
 - Loading and error states never leave the panel blank; the photo gallery stays
   below the viewer.
-- On unmount the viewer disposes geometries/materials and clears the
-  `useGLTF` cache.
+- On unmount the viewer disposes geometries/materials/textures and clears the
+  `useGLTF` / `useTexture` cache.
 - No `three` import in server components or route handlers.
 
 Furniture models: [Kenney](https://kenney.nl) Furniture Kit, CC0.
+Sample panoramas: [Poly Haven](https://polyhaven.com), CC0.
 
 ### Visual check
 
 ```bash
 npm run dev
 node scripts/shot.mjs http://localhost:3000/id/projects/studio-geost
-node scripts/shot-mobile.mjs
+node scripts/shot.mjs http://localhost:3000/id/projects/rumah-kubu-bandung shot-pano.png
+node scripts/shot-mobile.mjs http://localhost:3000/en/projects/rumah-kubu-bandung
 ```
 
 
@@ -125,6 +156,8 @@ node scripts/shot-mobile.mjs
 - All photography points at Unsplash URLs (`next.config.ts` `remotePatterns`);
   replace with real project photos in `public/images` and delete the remote
   pattern.
+- The two 360° panoramas are Poly Haven samples (CC0); replace them with real
+  360 photos and remove `"panoramaDemo": true`.
 - Services, pricing tiers, team members, and testimonials are sample copy —
   replace with the real Geost Studio lists (PRD open question #11).
 - Default `app/favicon.ico` from the scaffold.

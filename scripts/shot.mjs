@@ -19,7 +19,7 @@ page.on("pageerror", (e) => console.log("pageerror:", e.message));
 await page.goto(url, { waitUntil: "networkidle" });
 await page.waitForTimeout(6000);
 
-const viewer = page.locator('[role="group"][aria-label]').first();
+const viewer = page.locator("[data-viewer]").first();
 await viewer.scrollIntoViewIfNeeded();
 await page.waitForTimeout(2000);
 await viewer.screenshot({ path: out });

@@ -56,7 +56,14 @@
     "demoNote": "Demo room assembled from a low-poly furniture kit (Kenney, CC0) — not a real project.",
     "canvasLabel": "Interactive 3D viewer",
     "rotateLeft": "Rotate left",
-    "rotateRight": "Rotate right"
+    "rotateRight": "Rotate right",
+    "lookLeft": "Look left",
+    "lookRight": "Look right",
+    "panoramaTitle": "360° panorama",
+    "panoramaBadge": "360° photo",
+    "panoramaHint": "Drag to look around · pinch to zoom",
+    "panoramaDemoNote": "Sample panorama from Poly Haven (CC0) — replace with real project 360 photos.",
+    "panoramaNote": "A 360° photo taken from the middle of the room. Drag to look around."
   },
   "home": {
     "hero": {

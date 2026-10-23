@@ -56,7 +56,14 @@
     "demoNote": "Ruang demo disusun dari kit furnitur low-poly (Kenney, CC0) — bukan hasil proyek asli.",
     "canvasLabel": "Penampil 3D interaktif",
     "rotateLeft": "Putar ke kiri",
-    "rotateRight": "Putar ke kanan"
+    "rotateRight": "Putar ke kanan",
+    "lookLeft": "Geser ke kiri",
+    "lookRight": "Geser ke kanan",
+    "panoramaTitle": "Panorama 360°",
+    "panoramaBadge": "Foto 360°",
+    "panoramaHint": "Tarik untuk melihat sekeliling · cubit untuk zoom",
+    "panoramaDemoNote": "Panorama contoh dari Poly Haven (CC0) — ganti dengan foto 360° proyek asli.",
+    "panoramaNote": "Foto 360° diambil dari tengah ruangan. Tarik untuk melihat sekeliling."
   },
   "home": {
     "hero": {

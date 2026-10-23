@@ -4,6 +4,13 @@ import servicesData from "@/data/services.json";
 import teamData from "@/data/team.json";
 import demoRoomData from "@/data/demo-room.json";
 
+export type Panorama = {
+  image: string;
+  label_id: string;
+  label_en: string;
+  credit?: string;
+};
+
 export type Project = {
   slug: string;
   title_id: string;
@@ -21,6 +28,10 @@ export type Project = {
   poster?: string | null;
   /** Renders the interactive Kenney demo room instead of a real .glb. */
   demoScene?: boolean;
+  /** Equirectangular 360 photos, 2:1 aspect ratio. */
+  panoramas?: Panorama[];
+  /** True while the panorama images are placeholders, not real project photos. */
+  panoramaDemo?: boolean;
 };
 
 export type RoomPiece = {

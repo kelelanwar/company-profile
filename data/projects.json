@@ -17,7 +17,22 @@
       "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1400&q=80"
     ],
     "modelUrl": null,
-    "poster": null
+    "poster": null,
+    "panoramas": [
+      {
+        "image": "/images/panoramas/loft-living-360.jpg",
+        "label_id": "Ruang tinggal",
+        "label_en": "Living space",
+        "credit": "Poly Haven · CC0"
+      },
+      {
+        "image": "/images/panoramas/loft-lounge-360.jpg",
+        "label_id": "Lounge",
+        "label_en": "Lounge",
+        "credit": "Poly Haven · CC0"
+      }
+    ],
+    "panoramaDemo": true
   },
   {
     "slug": "loft-cipete",

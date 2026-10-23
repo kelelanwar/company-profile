@@ -24,14 +24,12 @@ page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
 await page.goto(url, { waitUntil: "networkidle" });
 await page.waitForTimeout(5000);
 
-const viewer = page.locator('[role="group"][aria-label]').first();
+const viewer = page.locator("[data-viewer]").first();
 await viewer.scrollIntoViewIfNeeded();
 await page.waitForTimeout(1500);
 await viewer.screenshot({ path: "shot-mobile.png" });
 
 await page.getByRole("button", { name: /reset/i }).click();
-await page.getByRole("button", { name: /rotate left/i }).click();
-await page.getByRole("button", { name: /rotate right/i }).click();
 await page.waitForTimeout(800);
 
 console.log("errors:", errors.length ? errors : "none");
