@@ -31,7 +31,8 @@ Verify `lint -> typecheck -> build` before opening a PR.
 | `components/layout/` | Fixed header (with locale switch) and footer |
 | `components/viewer/` | `PortfolioViewer` shell, `RoomScene` (Kenney demo), `PanoramaViewer`, `ModelScene` |
 | `components/preview/` | `PreviewStudio` — upload, prompt, presets, polling, before/after |
-| `app/api/preview/route.ts` | Server-side Replicate img2img endpoint (POST + GET poll) |
+| `lib/preview/providers.ts` | Ruvicode + Replicate adapters (server-only) |
+| `app/api/preview/route.ts` | Server-side img2img endpoint (POST + GET poll) |
 | `messages/{id,en}.json` | All UI copy — no user-facing strings in components |
 | `data/*.json` | Projects, services, team, studio notes, and the demo room layout |
 | `assets-src/kenney/` | Unmodified Kenney furniture kit (source, CC0) |
@@ -176,14 +177,38 @@ sees the API token and never calls the provider directly.
   localized copy; codes: `missing_token`, `rate_limited`, `invalid_image`,
   `image_too_large`, `invalid_prompt`, `blocked_prompt`, `provider_error`.
 
+### Providers
+
+Two adapters live in `lib/preview/providers.ts`; the route stays the same.
+
+| Provider | Env | Behaviour |
+| --- | --- | --- |
+| **Ruvicode** (default when its key exists) | `RUVICODE_API_KEY=rvcd_…` | `POST /v1/images/edits` (multipart, model `ruvicode-image-edit`), synchronous, returns the image as base64 → served as a data URL. No expiry, no polling. |
+| **Replicate** | `REPLICATE_API_TOKEN=r8_…` | SDXL img2img, async prediction + polling, returns a temporary URL (~1 hour). |
+
+Selection: `PREVIEW_PROVIDER=ruvicode|replicate` forces one; without it the
+app picks whichever key is configured (Ruvicode first).
+
+Optional overrides:
+
+```bash
+RUVICODE_IMAGE_MODEL=ruvicode-image-edit   # or …-uncensored
+RUVICODE_BASE_URL=https://api.ruvicode.com/v1
+```
+
+`prompt_strength` only exists on the Replicate path; Ruvicode keeps the input
+geometry (`aspect_ratio: auto`) and applies the prompt as an edit.
+
 ### Configuration
 
 ```bash
 # .env.local (never commit, never prefix with NEXT_PUBLIC_)
+RUVICODE_API_KEY=rvcd_...
+# or
 REPLICATE_API_TOKEN=r8_...
 ```
 
-Without a token the endpoint returns 503 `missing_token` and the UI shows the
+Without a key the endpoint returns 503 `missing_token` and the UI shows the
 bilingual "not configured" message, so the page stays usable in previews.
 
 ### Quick checks

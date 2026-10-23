@@ -1,10 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
-import Replicate from "replicate";
 import { z } from "zod";
+import {
+  pollPreview,
+  resolveProvider,
+  startPreview,
+  type ProviderFailure,
+} from "@/lib/preview/providers";
 
 export const maxDuration = 60;
 
-const MODEL = "stability-ai/sdxl";
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const MAX_REQUEST_BYTES = MAX_IMAGE_BYTES + 64 * 1024;
 const MIN_PROMPT = 3;
@@ -14,26 +18,11 @@ const RATE_WINDOW_MS = 60_000;
 const POLL_RATE_LIMIT = 240;
 
 const PRESETS = {
-  industrial: {
-    id: "industrial interior, exposed brick, blackened steel, warm practical lighting",
-    en: "industrial interior, exposed brick, blackened steel, warm practical lighting",
-  },
-  "warm-minimal": {
-    id: "warm minimal interior, oak timber, plaster walls, soft diffused daylight",
-    en: "warm minimal interior, oak timber, plaster walls, soft diffused daylight",
-  },
-  japandi: {
-    id: "japandi interior, natural linen, low furniture, muted earth tones",
-    en: "japandi interior, natural linen, low furniture, muted earth tones",
-  },
-  luxury: {
-    id: "refined luxury interior, stone surfaces, brass details, dramatic lighting",
-    en: "refined luxury interior, stone surfaces, brass details, dramatic lighting",
-  },
-  retail: {
-    id: "commercial retail interior, display lighting, durable finishes, clean circulation",
-    en: "commercial retail interior, display lighting, durable finishes, clean circulation",
-  },
+  industrial: "industrial interior, exposed brick, blackened steel, warm practical lighting",
+  "warm-minimal": "warm minimal interior, oak timber, plaster walls, soft diffused daylight",
+  japandi: "japandi interior, natural linen, low furniture, muted earth tones",
+  luxury: "refined luxury interior, stone surfaces, brass details, dramatic lighting",
+  retail: "commercial retail interior, display lighting, durable finishes, clean circulation",
 } as const;
 
 const BLOCKED_TERMS = [
@@ -131,15 +120,17 @@ function clientIp(request: NextRequest): string {
   return request.headers.get("x-real-ip") ?? "unknown";
 }
 
-function fail(
-  code: ErrorCode,
-  status: number,
-  extra?: Record<string, string>,
-) {
+function fail(code: ErrorCode, status: number, extra?: Record<string, string>) {
   return NextResponse.json(
     { error: { code, message: ERROR_MESSAGES[code] } },
     { status, headers: { "cache-control": "no-store", ...extra } },
   );
+}
+
+function providerFailure(error: ProviderFailure) {
+  if (error === "content_policy") return fail("blocked_prompt", 422);
+  if (error === "rate_limited") return fail("rate_limited", 429);
+  return fail("provider_error", 502);
 }
 
 const promptSchema = z.object({
@@ -151,7 +142,9 @@ const promptSchema = z.object({
 
 const idSchema = z.string().regex(/^[a-z0-9]{6,64}$/i);
 
-function sniffImageMime(bytes: Uint8Array): "image/jpeg" | "image/png" | "image/webp" | null {
+function sniffImageMime(
+  bytes: Uint8Array,
+): "image/jpeg" | "image/png" | "image/webp" | null {
   if (bytes.length < 12) return null;
 
   if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
@@ -167,28 +160,17 @@ function sniffImageMime(bytes: Uint8Array): "image/jpeg" | "image/png" | "image/
 }
 
 function composePrompt(prompt: string, preset?: keyof typeof PRESETS): string {
-  const style = preset ? `${PRESETS[preset].en}. ` : "";
+  const style = preset ? `${PRESETS[preset]}. ` : "";
   return `${style}${prompt}, interior design concept, photorealistic architectural visualization, natural perspective, high detail`;
 }
 
-function readOutput(output: unknown): string | null {
-  if (typeof output === "string") return output;
-  if (Array.isArray(output)) {
-    const url = output.find((item): item is string => typeof item === "string");
-    return url ?? null;
-  }
-  return null;
-}
-
-function token(): string | null {
-  const value = process.env.REPLICATE_API_TOKEN;
-  return value && value.trim().length > 0 ? value.trim() : null;
-}
-
-/** Starts an SDXL img2img prediction. The client polls GET /api/preview?id=… */
+/**
+ * Starts a preview. Replicate answers with a prediction id that the client
+ * polls; Ruvicode answers with the finished image in the same request.
+ */
 export async function POST(request: NextRequest) {
-  const apiToken = token();
-  if (!apiToken) return fail("missing_token", 503);
+  const config = resolveProvider();
+  if (!config) return fail("missing_token", 503);
 
   const limit = rateLimit(`create:${clientIp(request)}`, RATE_LIMIT, RATE_WINDOW_MS);
   if (limit.limited) {
@@ -207,12 +189,10 @@ export async function POST(request: NextRequest) {
 
   const image = formData.get("image");
   if (!(image instanceof File)) return fail("invalid_image", 422);
-
   if (image.size > MAX_IMAGE_BYTES) return fail("image_too_large", 413);
 
   const bytes = new Uint8Array(await image.arrayBuffer());
   const mime = sniffImageMime(bytes);
-
   if (!mime) return fail("invalid_image", 422);
 
   const parsed = promptSchema.safeParse({
@@ -234,37 +214,34 @@ export async function POST(request: NextRequest) {
     return fail("blocked_prompt", 422);
   }
 
-  try {
-    const replicate = new Replicate({ auth: apiToken });
-    const prediction = await replicate.predictions.create({
-      model: MODEL,
-      input: {
-        image: `data:${mime};base64,${Buffer.from(bytes).toString("base64")}`,
-        prompt: composePrompt(prompt, preset),
-        prompt_strength: strength,
-        num_inference_steps: 30,
-        guidance_scale: 7.5,
-        negative_prompt: "blurry, distorted geometry, watermark, text, low quality",
-      },
-    });
+  const result = await startPreview(config, {
+    bytes,
+    mime,
+    prompt: composePrompt(prompt, preset),
+    strength,
+  });
 
+  if (!result.ok) return providerFailure(result.error);
+
+  if (result.value.kind === "image") {
     return NextResponse.json(
-      { predictionId: prediction.id, status: prediction.status },
+      { status: "succeeded", imageUrl: result.value.imageUrl },
       { headers: { "cache-control": "no-store" } },
     );
-  } catch (error) {
-    console.error(
-      "[preview] provider error",
-      error instanceof Error ? error.name : "unknown",
-    );
-    return fail("provider_error", 502);
   }
+
+  return NextResponse.json(
+    { status: "starting", predictionId: result.value.id },
+    { headers: { "cache-control": "no-store" } },
+  );
 }
 
-/** Polls a prediction. Returns the temporary image URL once it succeeds. */
+/** Polls a Replicate prediction. Ruvicode returns the image from POST directly. */
 export async function GET(request: NextRequest) {
-  const apiToken = token();
-  if (!apiToken) return fail("missing_token", 503);
+  const config = resolveProvider();
+  if (!config) return fail("missing_token", 503);
+
+  if (config.provider !== "replicate") return fail("bad_request", 400);
 
   const limit = rateLimit(`poll:${clientIp(request)}`, POLL_RATE_LIMIT, RATE_WINDOW_MS);
   if (limit.limited) {
@@ -275,28 +252,21 @@ export async function GET(request: NextRequest) {
   const parsedId = idSchema.safeParse(id ?? "");
   if (!parsedId.success) return fail("not_found", 404);
 
-  try {
-    const replicate = new Replicate({ auth: apiToken });
-    const prediction = await replicate.predictions.get(parsedId.data);
+  const result = await pollPreview(config, parsedId.data);
+  if (!result.ok) return providerFailure(result.error);
 
-    if (prediction.status === "failed" || prediction.status === "canceled") {
-      return NextResponse.json(
-        {
-          status: prediction.status,
-          error: { code: "provider_error", message: ERROR_MESSAGES.provider_error },
-        },
-        { headers: { "cache-control": "no-store" } },
-      );
-    }
-
+  if (result.value.status === "failed" || result.value.status === "canceled") {
     return NextResponse.json(
       {
-        status: prediction.status,
-        imageUrl: prediction.status === "succeeded" ? readOutput(prediction.output) : null,
+        status: result.value.status,
+        error: { code: "provider_error", message: ERROR_MESSAGES.provider_error },
       },
       { headers: { "cache-control": "no-store" } },
     );
-  } catch {
-    return fail("provider_error", 502);
   }
+
+  return NextResponse.json(
+    { status: result.value.status, imageUrl: result.value.imageUrl },
+    { headers: { "cache-control": "no-store" } },
+  );
 }

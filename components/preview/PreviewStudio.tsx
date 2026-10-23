@@ -181,7 +181,17 @@ export function PreviewStudio({ locale, dict }: Props) {
         return;
       }
 
-      const created = (await response.json()) as { predictionId?: string };
+      const created = (await response.json()) as {
+        predictionId?: string;
+        imageUrl?: string;
+      };
+
+      if (created.imageUrl) {
+        setResultUrl(created.imageUrl);
+        setStatus("done");
+        return;
+      }
+
       if (!created.predictionId) {
         setErrorCode("provider_error");
         setStatus("error");
@@ -242,11 +252,7 @@ export function PreviewStudio({ locale, dict }: Props) {
   const canSubmit = Boolean(file) && !promptTooShort && !busy;
 
   const statusText =
-    status === "preparing"
-      ? copy.working
-      : status === "processing"
-        ? copy.rendering
-        : copy.queue;
+    status === "preparing" || status === "starting" ? copy.working : copy.rendering;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">
@@ -460,7 +466,10 @@ export function PreviewStudio({ locale, dict }: Props) {
                   {copy.download}
                 </a>
                 <a
-                  href={whatsappUrl(locale, `${prompt.trim()}\n${resultUrl}`)}
+                  href={whatsappUrl(
+                    locale,
+                    resultUrl.startsWith("http") ? `${prompt.trim()}\n${resultUrl}` : prompt.trim(),
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={btnGhost}
@@ -469,7 +478,9 @@ export function PreviewStudio({ locale, dict }: Props) {
                 </a>
               </div>
 
-              <p className="mt-4 text-xs leading-relaxed text-muted/80">{copy.expiry}</p>
+              {resultUrl.startsWith("http") ? (
+                <p className="mt-4 text-xs leading-relaxed text-muted/80">{copy.expiry}</p>
+              ) : null}
             </div>
           ) : null}
 
