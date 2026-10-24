@@ -341,15 +341,15 @@
     "preview": {
       "eyebrow": "AI Preview",
       "title": "See what your room could become, in seconds.",
-      "description": "Upload a photo of your room, describe the direction you want, and get a concept image to start the conversation.",
+      "description": "Describe the room you want, pick a style, and get a concept image to start the conversation.",
       "steps": [
         {
-          "title": "Upload a photo",
-          "body": "Use a bright, clear photo of the room, JPG/PNG/WebP up to 5 MB."
+          "title": "Describe it",
+          "body": "Tell us the room type, style, and materials you have in mind."
         },
         {
-          "title": "Describe it",
-          "body": "For example: “industrial living room, brick wall, warm lighting”."
+          "title": "Pick a style",
+          "body": "Five presets steer the palette and mood."
         },
         {
           "title": "Discuss the result",
@@ -357,13 +357,9 @@
         }
       ],
       "notice": "AI preview is a concept only, not a final construction result. Proportions, materials, and costs are still decided by technical design.",
-      "cta": "Send a photo on WhatsApp",
       "form": {
-        "uploadTitle": "Room photo",
-        "uploadCta": "Choose a photo",
-        "replaceCta": "Replace photo",
-        "uploadHint": "JPG, PNG, or WebP · up to 5 MB",
-        "dropHint": "Drop a photo here, or click to choose one",
+        "introTitle": "From a description to a concept",
+        "introBody": "No photo needed — just describe the room you want.",
         "promptLabel": "Design direction",
         "promptPlaceholder": "Example: industrial living room, exposed brick, warm lighting, grey sofa",
         "promptHint": "3–500 characters. The more specific, the closer the result.",
@@ -379,40 +375,27 @@
         "submit": "Generate preview",
         "submitting": "Sending…",
         "working": "Preparing the preview…",
-        "queue": "Waiting in the queue…",
         "rendering": "Rendering the concept…",
         "disclaimer": "AI output is a concept only, not a final construction result.",
-        "resultTitle": "Before / after",
-        "before": "Before",
-        "after": "After",
-        "sliderLabel": "Drag to compare",
+        "resultTitle": "Concept result",
         "download": "Download result",
         "again": "Try another direction",
         "expiry": "Result links are temporary (about 1 hour). Download it if you want to keep it.",
         "idleTitle": "Your preview will appear here",
-        "idleBody": "Upload a photo, write the direction, then press Generate preview.",
-        "previewAlt": "AI concept preview of the room",
-        "modeLabel": "Mode",
-        "modeEdit": "From a photo",
-        "modeGenerate": "From a description",
-        "generateHint": "No photo needed — just describe the room you want.",
-        "generateAlt": "AI generated room concept",
-        "resultTitleEdit": "Before / after",
-        "resultTitleGenerate": "Concept result",
+        "idleBody": "Write the direction, pick a style, then press Generate preview.",
+        "previewAlt": "AI generated room concept",
         "whatsappCta": "Discuss on WhatsApp"
       },
       "errors": {
         "rate_limited": "Too many requests. Wait a minute and try again.",
-        "invalid_image": "Please use a JPG, PNG, or WebP image.",
-        "image_too_large": "The image must be 5 MB or smaller.",
         "invalid_prompt": "Describe the direction in 3–500 characters.",
         "blocked_prompt": "The prompt contains a blocked term. Please rephrase it.",
         "missing_token": "AI preview is not enabled in this environment. Reach us on WhatsApp.",
+        "model_unavailable": "The AI preview service is unavailable right now. Try again later or contact us.",
         "provider_error": "The preview could not be generated. Please try again.",
         "network": "The connection dropped. Check your network and try again.",
         "timeout": "The preview is taking longer than usual. Please try again.",
-        "unknown": "Something went wrong. Please try again.",
-        "model_unavailable": "This mode is not available from the AI provider right now. Try the other mode or contact us."
+        "unknown": "Something went wrong. Please try again."
       }
     }
   },

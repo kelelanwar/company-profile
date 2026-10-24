@@ -5,7 +5,7 @@ page, project portfolio, 360° viewer (M3), and AI concept preview (M4).
 
 Stack: Next.js 16 App Router, React 19, TypeScript (strict), Tailwind CSS v4.
 3D: `three` + `@react-three/fiber` + `@react-three/drei`.
-AI: Replicate SDXL img2img through a server-side route handler.
+AI: text-to-image concept preview through a server-side route handler (Ruvicode or Replicate).
 
 ## Commands
 
@@ -30,9 +30,9 @@ Verify `lint -> typecheck -> build` before opening a PR.
 | `components/home/` | One component per home section, so sections stay swappable |
 | `components/layout/` | Fixed header (with locale switch) and footer |
 | `components/viewer/` | `PortfolioViewer` shell, `RoomScene` (Kenney demo), `PanoramaViewer`, `ModelScene` |
-| `components/preview/` | `PreviewStudio` — upload, prompt, presets, polling, before/after |
+| `components/preview/` | `PreviewStudio` — prompt, presets, polling, result |
 | `lib/preview/providers.ts` | Ruvicode + Replicate adapters (server-only) |
-| `app/api/preview/route.ts` | Server-side img2img endpoint (POST + GET poll) |
+| `app/api/preview/route.ts` | Server-side text-to-image endpoint (POST + GET poll) |
 | `messages/{id,en}.json` | All UI copy — no user-facing strings in components |
 | `data/*.json` | Projects, services, team, studio notes, and the demo room layout |
 | `assets-src/kenney/` | Unmodified Kenney furniture kit (source, CC0) |
@@ -148,43 +148,34 @@ node scripts/shot-mobile.mjs http://localhost:3000/en/projects/rumah-kubu-bandun
 
 ## AI preview (M4)
 
-`app/api/preview/route.ts` proxies Replicate SDXL img2img. The browser never
-sees the API token and never calls the provider directly.
+`app/api/preview/route.ts` proxies a text-to-image model. Visitors describe the
+room, pick a style, and receive one 16:9 concept image. The browser never sees
+the API token and never calls the provider directly.
 
 ### Flow
 
-1. `components/preview/PreviewStudio.tsx` validates the file on the client,
-   re-encodes it through a canvas (strips EXIF/GPS, caps the long edge at
-   1536 px) and sends multipart form data.
-2. `POST /api/preview` validates with `zod`, checks the file signature, and
-   starts a prediction (`stability-ai/sdxl`, `prompt_strength` 0.3–0.6,
-   default 0.45, 30 steps). It returns `{ predictionId, status }`.
-3. The client polls `GET /api/preview?id=…` every 2 s (max ~100 s) and renders
-   the temporary image URL with a before/after slider, download link, and a
-   WhatsApp hand-off that carries the prompt.
+1. `components/preview/PreviewStudio.tsx` validates the prompt (3–500 chars)
+   and sends `prompt`, `locale`, and `preset` as form data.
+2. `POST /api/preview` validates with `zod`, checks the block list, and composes
+   the preset style into the prompt.
+3. Ruvicode answers with the finished image (base64 → data URL, no expiry);
+   Replicate returns `{ predictionId }` and the client polls
+   `GET /api/preview?id=…` every 2 s (max ~100 s) for a temporary URL.
+4. The result is shown with a download button and a WhatsApp hand-off carrying
+   the prompt, plus the bilingual "concept only" disclaimer.
 
 ### Limits and guards
 
-- Upload: 5 MB, JPG/PNG/WebP only, verified by magic bytes (`ff d8 ff`,
-  PNG signature, `RIFF…WEBP`), not just the MIME header.
 - Prompt: 3–500 characters, plus a small bilingual block list for NSFW terms.
-- Rate limit: 10 predictions/minute/IP, 240 polls/minute/IP. It is an
-  in-memory map (fine for local dev and single-instance hosting); swap in
-  Upstash/Redis before scaling to multiple serverless instances.
-- Uploads live in memory only — nothing is written to `public/` or `/tmp`, and
-  base64 data or tokens are never logged.
+- Request body is capped at 16 KB — there is no image upload path.
+- Rate limit: 10 generations/minute/IP, 240 polls/minute/IP. It is an in-memory
+  map (fine for local dev and single-instance hosting); swap in Upstash/Redis
+  before scaling to multiple serverless instances.
+- Prompts, generated images, and tokens are never logged.
 - Errors return `{ error: { code, message: { id, en } } }` so the UI can show
-  localized copy; codes: `missing_token`, `rate_limited`, `invalid_image`,
-  `image_too_large`, `invalid_prompt`, `blocked_prompt`, `provider_error`.
-
-### Modes
-
-| Mode | Endpoint | Notes |
-| --- | --- | --- |
-| `edit` (img2img) | `/v1/images/edits` (Ruvicode) or SDXL `image` + `prompt_strength` (Replicate) | Keeps the room geometry; before/after slider in the UI. |
-| `generate` (text2img) | `/v1/images/generations` (Ruvicode, JSON body) or SDXL without `image` (Replicate) | No upload needed; the UI shows a single 16:9 concept. |
-
-`mode` is a form field (`edit` default) and is validated by `zod`.
+  localized copy; codes: `missing_token`, `rate_limited`, `invalid_prompt`,
+  `blocked_prompt`, `model_unavailable`, `provider_error`, `not_found`,
+  `bad_request`.
 
 ### Providers
 
@@ -192,25 +183,22 @@ Two adapters live in `lib/preview/providers.ts`; the route stays the same.
 
 | Provider | Env | Behaviour |
 | --- | --- | --- |
-| **Ruvicode** (default when its key exists) | `RUVICODE_API_KEY=rvcd_…` | OpenAI-compatible. Edit returns the image as base64 (data URL, no expiry), generate accepts a JSON body. |
-| **Replicate** | `REPLICATE_API_TOKEN=r8_…` | SDXL, async prediction + polling, temporary URL (~1 hour) for both modes. |
+| **Ruvicode** (default when its key exists) | `RUVICODE_API_KEY=rvcd_…` | OpenAI-compatible `POST /v1/images/generations` with a JSON body, model `ruvicode-image`. Returns the image as base64, served as a data URL (no expiry). |
+| **Replicate** | `REPLICATE_API_TOKEN=r8_…` | SDXL text-to-image at 1024×1024, async prediction + polling, temporary URL (~1 hour). |
 
-Selection: `PREVIEW_PROVIDER=ruvicode|replicate` forces one; without it the
-app picks whichever key is configured (Ruvicode first).
+Selection: `PREVIEW_PROVIDER=ruvicode|replicate` forces one; without it the app
+picks whichever key is configured (Ruvicode first).
 
 Optional overrides:
 
 ```bash
-RUVICODE_MODEL=ruvicode-image              # generate
-RUVICODE_EDIT_MODEL=ruvicode-image-edit    # edit (check availability first)
+RUVICODE_MODEL=ruvicode-image
 RUVICODE_BASE_URL=https://api.ruvicode.com/v1
 ```
 
-If the provider answers `403`/`404` for a model (not enabled for the key, or
-temporarily unavailable), the API returns `503 model_unavailable` and the UI
-suggests switching mode instead of showing a generic failure.
-
-`prompt_strength` only exists on the Replicate edit path.
+If the provider answers `403`/`404` for the model (not enabled for the key, or
+temporarily unavailable), the API returns `503 model_unavailable` with a
+bilingual message instead of a generic failure.
 
 ### Configuration
 
@@ -227,15 +215,13 @@ bilingual "not configured" message, so the page stays usable in previews.
 ### Quick checks
 
 ```bash
-curl -X POST http://localhost:3000/api/preview \
-  -F "image=@room.jpg;type=image/jpeg" \
-  -F "prompt=industrial living room, brick wall" -F "locale=en"
-# -> 422 / 503 / 429 / 201 depending on the input and configuration
+curl -X POST http://localhost:3000/api/preview   -F "prompt=industrial living room, brick wall, warm lighting"   -F "preset=industrial" -F "locale=en"
+# -> 200 { "status": "succeeded", "imageUrl": "data:image/jpeg;base64,…" }
+# -> 422 / 429 / 503 depending on the input and configuration
 ```
 
-Result URLs from Replicate expire after roughly an hour; the UI says so and
-offers a download button.
-
+Replicate result URLs expire after roughly an hour; the UI says so and offers a
+download button.
 
 ## Placeholders to replace before launch
 
