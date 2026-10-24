@@ -388,7 +388,7 @@
         "sliderLabel": "Drag to compare",
         "download": "Download result",
         "again": "Try another direction",
-        "expiry": "Result links are temporary (about 1 hour). Download it if you want to keep it.",
+        "expiry": "Result links are temporary. Download the image if you want to keep it.",
         "idleTitle": "Your preview will appear here",
         "idleBody": "Upload a photo, write the direction, then press Generate preview.",
         "previewAlt": "AI concept preview of the room",

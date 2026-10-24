@@ -4,6 +4,7 @@ import {
   pollPreview,
   resolveProvider,
   startPreview,
+  type PreviewMode,
   type ProviderFailure,
 } from "@/lib/preview/providers";
 
@@ -147,7 +148,7 @@ const promptSchema = z.object({
   strength: z.coerce.number().min(0.3).max(0.6).default(0.45),
 });
 
-const idSchema = z.string().regex(/^[a-z0-9]{6,64}$/i);
+const idSchema = z.string().regex(/^[a-z0-9:_-]{8,160}$/i);
 
 function sniffImageMime(
   bytes: Uint8Array,
@@ -166,8 +167,17 @@ function sniffImageMime(
   return null;
 }
 
-function composePrompt(prompt: string, preset?: keyof typeof PRESETS): string {
+function composePrompt(
+  prompt: string,
+  preset?: keyof typeof PRESETS,
+  mode: PreviewMode = "generate",
+): string {
   const style = preset ? `${PRESETS[preset]}. ` : "";
+
+  if (mode === "edit") {
+    return `Redesign this interior photo: ${style}${prompt}. Keep the room layout, walls, and window positions, photorealistic interior render.`;
+  }
+
   return `${style}${prompt}, interior design concept, photorealistic architectural visualization, natural perspective, high detail`;
 }
 
@@ -232,7 +242,7 @@ export async function POST(request: NextRequest) {
     mode,
     bytes,
     mime,
-    prompt: composePrompt(prompt, preset),
+    prompt: composePrompt(prompt, preset, mode),
     strength,
   });
 
@@ -256,7 +266,8 @@ export async function GET(request: NextRequest) {
   const config = resolveProvider();
   if (!config) return fail("missing_token", 503);
 
-  if (config.provider !== "replicate") return fail("bad_request", 400);
+  // Ruvicode answers synchronously; only fal and Replicate need polling.
+  if (config.provider === "ruvicode") return fail("bad_request", 400);
 
   const limit = rateLimit(`poll:${clientIp(request)}`, POLL_RATE_LIMIT, RATE_WINDOW_MS);
   if (limit.limited) {

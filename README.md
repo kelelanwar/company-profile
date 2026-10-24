@@ -148,77 +148,104 @@ node scripts/shot-mobile.mjs http://localhost:3000/en/projects/rumah-kubu-bandun
 
 ## AI preview (M4)
 
-`app/api/preview/route.ts` proxies Replicate SDXL img2img. The browser never
-sees the API token and never calls the provider directly.
+`app/api/preview/route.ts` proxies image models. There are two modes:
+
+- **edit** — upload a room photo plus a prompt; the model keeps the layout and
+  restyles the interior.
+- **generate** — text only, one 16:9 concept image.
+
+The browser never sees the API token and never calls a provider directly.
 
 ### Flow
 
-1. `components/preview/PreviewStudio.tsx` validates the file on the client,
-   re-encodes it through a canvas (strips EXIF/GPS, caps the long edge at
-   1536 px) and sends multipart form data.
-2. `POST /api/preview` validates with `zod`, checks the file signature, and
-   starts a prediction (`stability-ai/sdxl`, `prompt_strength` 0.3–0.6,
-   default 0.45, 30 steps). It returns `{ predictionId, status }`.
-3. The client polls `GET /api/preview?id=…` every 2 s (max ~100 s) and renders
-   the temporary image URL with a before/after slider, download link, and a
-   WhatsApp hand-off that carries the prompt.
-
-### Limits and guards
-
-- Upload: 5 MB, JPG/PNG/WebP only, verified by magic bytes (`ff d8 ff`,
-  PNG signature, `RIFF…WEBP`), not just the MIME header.
-- Prompt: 3–500 characters, plus a small bilingual block list for NSFW terms.
-- Rate limit: 10 predictions/minute/IP, 240 polls/minute/IP. It is an
-  in-memory map (fine for local dev and single-instance hosting); swap in
-  Upstash/Redis before scaling to multiple serverless instances.
-- Uploads live in memory only — nothing is written to `public/` or `/tmp`, and
-  base64 data or tokens are never logged.
-- Errors return `{ error: { code, message: { id, en } } }` so the UI can show
-  localized copy; codes: `missing_token`, `rate_limited`, `invalid_image`,
-  `image_too_large`, `invalid_prompt`, `blocked_prompt`, `provider_error`.
-
-### Modes
-
-| Mode | Endpoint | Notes |
-| --- | --- | --- |
-| `edit` (img2img) | `/v1/images/edits` (Ruvicode) or SDXL `image` + `prompt_strength` (Replicate) | Keeps the room geometry; before/after slider in the UI. |
-| `generate` (text2img) | `/v1/images/generations` (Ruvicode, JSON body) or SDXL without `image` (Replicate) | No upload needed; the UI shows a single 16:9 concept. |
-
-`mode` is a form field (`edit` default) and is validated by `zod`.
+1. `components/preview/PreviewStudio.tsx` validates the file (5 MB, JPG/PNG/WebP),
+   re-encodes it through a canvas (strips EXIF/GPS, max 1536 px) and sends
+   multipart form data with the prompt, locale, and preset.
+2. `POST /api/preview` validates with `zod`, checks the image signature and the
+   block list, and composes the selected preset into the prompt.
+3. The provider runs the job:
+   - **fal** — the photo is staged on fal storage, a queue request is submitted,
+     and `fal:<mode>:<request_id>` is returned for polling.
+   - **Ruvicode** — synchronous `/images/edits` or `/images/generations`, image
+     returned as a data URL.
+   - **Replicate** — SDXL prediction id plus polling for a temporary URL.
+4. The result is shown with a before/after slider (edit mode), download button,
+   WhatsApp hand-off carrying the prompt, and the bilingual disclaimer.
 
 ### Providers
 
-Two adapters live in `lib/preview/providers.ts`; the route stays the same.
+| Provider | Env | Edit | Generate | Transport |
+| --- | --- | --- | --- | --- |
+| **fal** (default when key exists) | `FAL_KEY` | `FAL_MODEL_EDIT` (default `fal-ai/flux-pro/kontext`) | `FAL_MODEL_GENERATE` (default `fal-ai/flux/schnell`) | queue + polling, photo staged on fal storage |
+| Ruvicode | `RUVICODE_API_KEY` | `ruvicode-image-edit` (often unavailable) | `ruvicode-image` | synchronous, data URL |
+| Replicate | `REPLICATE_API_TOKEN` | SDXL img2img | SDXL text2img | prediction + polling |
 
-| Provider | Env | Behaviour |
-| --- | --- | --- |
-| **Ruvicode** (default when its key exists) | `RUVICODE_API_KEY=rvcd_…` | OpenAI-compatible. Edit returns the image as base64 (data URL, no expiry), generate accepts a JSON body. |
-| **Replicate** | `REPLICATE_API_TOKEN=r8_…` | SDXL, async prediction + polling, temporary URL (~1 hour) for both modes. |
-
-Selection: `PREVIEW_PROVIDER=ruvicode|replicate` forces one; without it the
-app picks whichever key is configured (Ruvicode first).
+Selection: `PREVIEW_PROVIDER=fal|ruvicode|replicate` forces one. Without it the
+app picks fal, then Ruvicode, then Replicate, whichever key exists.
 
 Optional overrides:
 
 ```bash
-RUVICODE_MODEL=ruvicode-image              # generate
-RUVICODE_EDIT_MODEL=ruvicode-image-edit    # edit (check availability first)
+FAL_MODEL_EDIT=fal-ai/flux-pro/kontext
+FAL_MODEL_GENERATE=fal-ai/flux/schnell
+RUVICODE_MODEL=ruvicode-image
 RUVICODE_BASE_URL=https://api.ruvicode.com/v1
 ```
 
-If the provider answers `403`/`404` for a model (not enabled for the key, or
-temporarily unavailable), the API returns `503 model_unavailable` and the UI
-suggests switching mode instead of showing a generic failure.
+### fal cost notes
 
-`prompt_strength` only exists on the Replicate edit path.
+fal has **no free tier** — every request needs a funded key. For cheap testing
+switch the generate model:
+
+- `fal-ai/flux/schnell` — about $0.003 per megapixel (cheapest).
+- `fal-ai/flux-pro/kontext` — instruction-based edit; price is on the model page.
+- `fal-ai/flux/dev/image-to-image` — cheaper img2img alternative; its input uses
+  `strength` instead of Kontext fields, so adjust the adapter if you switch.
+
+### Testing without a key
+
+`FAL_MOCK_URL` rewrites every fal host to a local mock server, so the whole
+queue/upload flow can be exercised offline:
+
+```bash
+FAL_KEY=fal_test FAL_MOCK_URL=http://127.0.0.1:4011 PREVIEW_PROVIDER=fal npm run dev
+```
+
+The mock only needs:
+
+```
+POST /storage/upload/initiate        -> { upload_url, file_url }
+PUT  <upload_url>                    -> 200
+POST /fal-ai/<app>/<endpoint>        -> { request_id }
+GET  /fal-ai/<app>/requests/<id>/status -> { status: IN_QUEUE|IN_PROGRESS|COMPLETED }
+GET  /fal-ai/<app>/requests/<id>     -> { images: [{ url }] }
+```
+
+Never set `FAL_MOCK_URL` in production.
+
+### Limits and guards
+
+- Upload: 5 MB, JPG/PNG/WebP, verified by magic bytes rather than the MIME header.
+- Prompt: 3–500 characters plus a small bilingual block list for NSFW terms.
+- Rate limit: 10 creations/minute/IP, 240 polls/minute/IP (in-memory map; move to
+  Redis when running multiple instances).
+- Uploads stay in memory; in edit mode only fal receives a staged copy, and no
+  base64 payloads or keys are logged.
+- Errors return `{ error: { code, message: { id, en } } }`; codes:
+  `missing_token`, `rate_limited`, `invalid_image`, `image_too_large`,
+  `invalid_prompt`, `blocked_prompt`, `model_unavailable`, `provider_error`,
+  `not_found`, `bad_request`.
 
 ### Configuration
 
 ```bash
 # .env.local (never commit, never prefix with NEXT_PUBLIC_)
-RUVICODE_API_KEY=rvcd_...
-# or
-REPLICATE_API_TOKEN=r8_...
+FAL_KEY=...
+PREVIEW_PROVIDER=fal
+
+# alternatives
+REPLICATE_API_TOKEN=
+RUVICODE_API_KEY=
 ```
 
 Without a key the endpoint returns 503 `missing_token` and the UI shows the
@@ -227,15 +254,11 @@ bilingual "not configured" message, so the page stays usable in previews.
 ### Quick checks
 
 ```bash
-curl -X POST http://localhost:3000/api/preview \
-  -F "image=@room.jpg;type=image/jpeg" \
-  -F "prompt=industrial living room, brick wall" -F "locale=en"
-# -> 422 / 503 / 429 / 201 depending on the input and configuration
+curl -X POST http://localhost:3000/api/preview   -F "mode=generate" -F "prompt=industrial living room, brick wall"   -F "preset=industrial" -F "locale=en"
+
+curl -X POST http://localhost:3000/api/preview   -F "mode=edit" -F "image=@room.jpg;type=image/jpeg"   -F "prompt=exposed brick, warm lighting" -F "locale=en"
+# -> 200 with predictionId (fal/replicate) or imageUrl (ruvicode)
 ```
-
-Result URLs from Replicate expire after roughly an hour; the UI says so and
-offers a download button.
-
 
 ## Placeholders to replace before launch
 

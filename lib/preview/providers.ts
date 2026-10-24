@@ -1,6 +1,7 @@
 import Replicate from "replicate";
+import { ApiError, fal } from "@fal-ai/client";
 
-export type PreviewProvider = "ruvicode" | "replicate";
+export type PreviewProvider = "fal" | "ruvicode" | "replicate";
 export type PreviewMode = "edit" | "generate";
 
 export type ProviderConfig = {
@@ -50,8 +51,13 @@ function ruvicodeModel(mode: PreviewMode): string {
 
 export function resolveProvider(): ProviderConfig | null {
   const requested = process.env.PREVIEW_PROVIDER?.trim().toLowerCase();
+  const falKey = process.env.FAL_KEY?.trim();
   const ruvicodeKey = process.env.RUVICODE_API_KEY?.trim();
   const replicateKey = process.env.REPLICATE_API_TOKEN?.trim();
+
+  if (requested === "fal") {
+    return falKey ? { provider: "fal", key: falKey } : null;
+  }
 
   if (requested === "ruvicode") {
     return ruvicodeKey ? { provider: "ruvicode", key: ruvicodeKey } : null;
@@ -61,7 +67,8 @@ export function resolveProvider(): ProviderConfig | null {
     return replicateKey ? { provider: "replicate", key: replicateKey } : null;
   }
 
-  // No explicit provider: use whichever key is configured, Ruvicode first.
+  // No explicit provider: use whichever key is configured, fal first.
+  if (falKey) return { provider: "fal", key: falKey };
   if (ruvicodeKey) return { provider: "ruvicode", key: ruvicodeKey };
   if (replicateKey) return { provider: "replicate", key: replicateKey };
   return null;
@@ -71,9 +78,133 @@ export async function startPreview(
   config: ProviderConfig,
   input: StartInput,
 ): Promise<Outcome<StartResult>> {
+  if (config.provider === "fal") return startFal(config.key, input);
   return config.provider === "ruvicode"
     ? startRuvicode(config.key, input)
     : startReplicate(config.key, input);
+}
+
+const FAL_DEFAULT_EDIT_MODEL = "fal-ai/flux-pro/kontext";
+const FAL_DEFAULT_GENERATE_MODEL = "fal-ai/flux/schnell";
+
+function falModel(mode: PreviewMode): string {
+  if (mode === "edit") {
+    return process.env.FAL_MODEL_EDIT?.trim() || FAL_DEFAULT_EDIT_MODEL;
+  }
+
+  return process.env.FAL_MODEL_GENERATE?.trim() || FAL_DEFAULT_GENERATE_MODEL;
+}
+
+/**
+ * Test hook only: rewrites fal hosts to a local mock server. Never set
+ * FAL_MOCK_URL in production.
+ */
+function falFetchOverride(): typeof fetch | undefined {
+  const mock = process.env.FAL_MOCK_URL?.trim();
+  if (!mock) return undefined;
+
+  return (input, init) => {
+    const raw =
+      typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    const url = raw
+      .replace(/^https:\/\/(?:[a-z0-9-]+\.)?fal\.run/i, mock)
+      .replace(/^https:\/\/rest(?:\.alpha)?\.fal\.ai/i, mock);
+    return fetch(url, init);
+  };
+}
+
+function falClient(key: string) {
+  const fetchOverride = falFetchOverride();
+
+  fal.config(
+    fetchOverride ? { credentials: key, fetch: fetchOverride } : { credentials: key },
+  );
+
+  return fal;
+}
+
+function mapFalError(error: unknown): ProviderFailure {
+  if (error instanceof ApiError) {
+    if (error.status === 429) return "rate_limited";
+    if (error.status === 404) return "model_unavailable";
+    if (error.status === 422) {
+      const body = JSON.stringify(error.body ?? "").toLowerCase();
+      if (body.includes("nsfw") || body.includes("safety") || body.includes("moderation")) {
+        return "content_policy";
+      }
+    }
+  }
+
+  return "provider_error";
+}
+
+async function startFal(
+  key: string,
+  input: StartInput,
+): Promise<Outcome<StartResult>> {
+  const client = falClient(key);
+  const model = falModel(input.mode);
+
+  try {
+    const payload: Record<string, unknown> = {
+      prompt: input.prompt,
+      num_images: 1,
+      output_format: "jpeg",
+    };
+
+    if (input.mode === "edit") {
+      if (!input.bytes || !input.mime) {
+        return { ok: false, error: "provider_error" };
+      }
+
+      // fal needs a URL, so the upload is staged on fal storage first.
+      payload.image_url = await client.storage.upload(
+        new Blob([new Uint8Array(input.bytes)], { type: input.mime }),
+      );
+      payload.safety_tolerance = "2";
+    } else {
+      payload.image_size = "landscape_16_9";
+    }
+
+    const { request_id } = await client.queue.submit(model, { input: payload });
+
+    return { ok: true, value: { kind: "pending", id: `fal:${input.mode}:${request_id}` } };
+  } catch (error) {
+    const failure = mapFalError(error);
+    console.error("[preview] fal error", failure);
+    return { ok: false, error: failure };
+  }
+}
+
+function parseFalJob(id: string): { mode: PreviewMode; requestId: string } | null {
+  if (!id.startsWith("fal:")) return null;
+
+  const [, mode, ...rest] = id.split(":");
+  const requestId = rest.join(":");
+
+  if ((mode !== "edit" && mode !== "generate") || requestId.length < 6) return null;
+
+  return { mode, requestId };
+}
+
+function readFalImage(data: unknown): string | null {
+  if (typeof data !== "object" || data === null) return null;
+
+  const record = data as { images?: unknown; image?: unknown };
+  const images = Array.isArray(record.images) ? record.images : [];
+
+  for (const item of images) {
+    if (typeof item !== "object" || item === null) continue;
+    const url = (item as { url?: unknown }).url;
+    if (typeof url === "string" && url.length > 0) return url;
+  }
+
+  if (typeof record.image === "object" && record.image !== null) {
+    const url = (record.image as { url?: unknown }).url;
+    if (typeof url === "string") return url;
+  }
+
+  return null;
 }
 
 async function startRuvicode(
@@ -195,6 +326,40 @@ export async function pollPreview(
   config: ProviderConfig,
   id: string,
 ): Promise<Outcome<{ status: string; imageUrl: string | null }>> {
+  if (config.provider === "fal") {
+    const job = parseFalJob(id);
+    if (!job) return { ok: false, error: "provider_error" };
+
+    const client = falClient(config.key);
+    const model = falModel(job.mode);
+
+    try {
+      const status = await client.queue.status(model, { requestId: job.requestId });
+
+      if (status.status === "COMPLETED") {
+        const result = await client.queue.result(model, { requestId: job.requestId });
+        const imageUrl = readFalImage(result.data);
+
+        return {
+          ok: true,
+          value: imageUrl
+            ? { status: "succeeded", imageUrl }
+            : { status: "failed", imageUrl: null },
+        };
+      }
+
+      return {
+        ok: true,
+        value: {
+          status: status.status === "IN_QUEUE" ? "starting" : "processing",
+          imageUrl: null,
+        },
+      };
+    } catch (error) {
+      return { ok: false, error: mapFalError(error) };
+    }
+  }
+
   if (config.provider !== "replicate") {
     return { ok: false, error: "provider_error" };
   }
