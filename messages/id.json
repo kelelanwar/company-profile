@@ -341,15 +341,15 @@
     "preview": {
       "eyebrow": "Pratinjau AI",
       "title": "Lihat kemungkinan ruang Anda dalam hitungan detik.",
-      "description": "Tuliskan gambaran ruangan yang Anda inginkan, pilih gaya, dan dapatkan gambar konsep sebagai bahan diskusi awal.",
+      "description": "Unggah foto ruangan, tuliskan arah desain yang Anda inginkan, dan dapatkan gambar konsep sebagai bahan diskusi awal.",
       "steps": [
         {
-          "title": "Tulis arahan",
-          "body": "Jelaskan jenis ruangan, gaya, dan material yang Anda inginkan."
+          "title": "Unggah foto",
+          "body": "Gunakan foto ruangan yang terang, JPG/PNG/WebP maksimal 5 MB."
         },
         {
-          "title": "Pilih gaya",
-          "body": "Lima preset membantu mengarahkan warna dan suasana."
+          "title": "Tulis arahan",
+          "body": "Contoh: “ruang tamu industrial, dinding bata, pencahayaan hangat”."
         },
         {
           "title": "Diskusikan hasilnya",
@@ -357,9 +357,13 @@
         }
       ],
       "notice": "Pratinjau AI hanya konsep, bukan hasil akhir konstruksi. Proporsi, material, dan biaya tetap ditentukan oleh desain teknis.",
+      "cta": "Kirim foto via WhatsApp",
       "form": {
-        "introTitle": "Dari deskripsi ke konsep",
-        "introBody": "Tidak perlu foto — cukup jelaskan ruangan yang Anda inginkan.",
+        "uploadTitle": "Foto ruangan",
+        "uploadCta": "Pilih foto",
+        "replaceCta": "Ganti foto",
+        "uploadHint": "JPG, PNG, atau WebP · maksimal 5 MB",
+        "dropHint": "Tarik foto ke sini, atau klik untuk memilih",
         "promptLabel": "Arahan desain",
         "promptPlaceholder": "Contoh: ruang tamu industrial, dinding bata ekspos, pencahayaan hangat, sofa abu-abu",
         "promptHint": "3–500 karakter. Semakin spesifik, semakin dekat hasilnya.",
@@ -375,27 +379,40 @@
         "submit": "Buat pratinjau",
         "submitting": "Mengirim…",
         "working": "Menyiapkan pratinjau…",
+        "queue": "Menunggu antrean…",
         "rendering": "Merender konsep…",
         "disclaimer": "Hasil AI hanya konsep, bukan hasil akhir konstruksi.",
-        "resultTitle": "Hasil konsep",
+        "resultTitle": "Sebelum / sesudah",
+        "before": "Sebelum",
+        "after": "Sesudah",
+        "sliderLabel": "Geser untuk membandingkan",
         "download": "Unduh hasil",
         "again": "Coba arahan lain",
         "expiry": "Tautan hasil berlaku sementara (±1 jam). Unduh jika ingin menyimpannya.",
         "idleTitle": "Hasil pratinjau muncul di sini",
-        "idleBody": "Tulis arahan, pilih gaya, lalu tekan Buat pratinjau.",
-        "previewAlt": "Konsep ruangan hasil AI",
+        "idleBody": "Unggah foto, tulis arahan, lalu tekan Buat pratinjau.",
+        "previewAlt": "Pratinjau konsep AI untuk ruangan",
+        "modeLabel": "Mode",
+        "modeEdit": "Dari foto",
+        "modeGenerate": "Dari deskripsi",
+        "generateHint": "Tidak perlu foto — cukup jelaskan ruangan yang Anda inginkan.",
+        "generateAlt": "Konsep ruangan hasil AI",
+        "resultTitleEdit": "Sebelum / sesudah",
+        "resultTitleGenerate": "Hasil konsep",
         "whatsappCta": "Diskusikan via WhatsApp"
       },
       "errors": {
         "rate_limited": "Terlalu banyak permintaan. Tunggu satu menit lalu coba lagi.",
+        "invalid_image": "Gunakan gambar JPG, PNG, atau WebP.",
+        "image_too_large": "Ukuran gambar maksimal 5 MB.",
         "invalid_prompt": "Tuliskan arahan 3–500 karakter.",
         "blocked_prompt": "Arahan berisi kata yang tidak diizinkan. Ubah deskripsi Anda.",
         "missing_token": "Pratinjau AI belum aktif di lingkungan ini. Hubungi kami lewat WhatsApp.",
-        "model_unavailable": "Layanan pratinjau AI sedang tidak tersedia. Coba lagi nanti atau hubungi kami.",
         "provider_error": "Gagal membuat pratinjau. Coba lagi sebentar.",
         "network": "Koneksi terputus. Periksa jaringan lalu coba lagi.",
         "timeout": "Pratinjau memakan waktu lebih lama dari biasanya. Coba lagi.",
-        "unknown": "Terjadi kesalahan. Coba lagi."
+        "unknown": "Terjadi kesalahan. Coba lagi.",
+        "model_unavailable": "Mode ini sedang tidak tersedia di penyedia AI. Coba mode lain atau hubungi kami."
       }
     }
   },

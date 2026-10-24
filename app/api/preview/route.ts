@@ -9,7 +9,8 @@ import {
 
 export const maxDuration = 60;
 
-const MAX_REQUEST_BYTES = 16 * 1024;
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_REQUEST_BYTES = MAX_IMAGE_BYTES + 64 * 1024;
 const MIN_PROMPT = 3;
 const MAX_PROMPT = 500;
 const RATE_LIMIT = 10;
@@ -41,6 +42,8 @@ const BLOCKED_TERMS = [
 type ErrorCode =
   | "missing_token"
   | "rate_limited"
+  | "invalid_image"
+  | "image_too_large"
   | "invalid_prompt"
   | "blocked_prompt"
   | "model_unavailable"
@@ -57,6 +60,14 @@ const ERROR_MESSAGES: Record<ErrorCode, { id: string; en: string }> = {
     id: "Terlalu banyak permintaan. Coba lagi dalam satu menit.",
     en: "Too many requests. Please try again in a minute.",
   },
+  invalid_image: {
+    id: "Format gambar harus JPG, PNG, atau WebP.",
+    en: "The image must be JPG, PNG, or WebP.",
+  },
+  image_too_large: {
+    id: "Ukuran gambar maksimal 5 MB.",
+    en: "The image must be 5 MB or smaller.",
+  },
   invalid_prompt: {
     id: "Tuliskan arahan desain 3–500 karakter.",
     en: "Describe the design in 3–500 characters.",
@@ -66,8 +77,8 @@ const ERROR_MESSAGES: Record<ErrorCode, { id: string; en: string }> = {
     en: "The prompt contains a blocked term. Please rephrase it.",
   },
   model_unavailable: {
-    id: "Layanan pratinjau AI sedang tidak tersedia. Coba lagi nanti atau hubungi kami.",
-    en: "The AI preview service is unavailable right now. Try again later or contact us.",
+    id: "Mode ini sedang tidak tersedia di penyedia AI. Coba mode lain atau hubungi kami.",
+    en: "This mode is not available from the AI provider right now. Try the other mode or contact us.",
   },
   provider_error: {
     id: "Gagal membuat pratinjau. Coba lagi sebentar.",
@@ -131,10 +142,29 @@ function providerFailure(error: ProviderFailure) {
 const promptSchema = z.object({
   prompt: z.string().trim().min(MIN_PROMPT).max(MAX_PROMPT),
   locale: z.enum(["id", "en"]).default("id"),
+  mode: z.enum(["edit", "generate"]).default("edit"),
   preset: z.enum(["industrial", "warm-minimal", "japandi", "luxury", "retail"]).optional(),
+  strength: z.coerce.number().min(0.3).max(0.6).default(0.45),
 });
 
 const idSchema = z.string().regex(/^[a-z0-9]{6,64}$/i);
+
+function sniffImageMime(
+  bytes: Uint8Array,
+): "image/jpeg" | "image/png" | "image/webp" | null {
+  if (bytes.length < 12) return null;
+
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
+
+  const png = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+  if (png.every((value, index) => bytes[index] === value)) return "image/png";
+
+  const riff = String.fromCharCode(...bytes.slice(0, 4));
+  const webp = String.fromCharCode(...bytes.slice(8, 12));
+  if (riff === "RIFF" && webp === "WEBP") return "image/webp";
+
+  return null;
+}
 
 function composePrompt(prompt: string, preset?: keyof typeof PRESETS): string {
   const style = preset ? `${PRESETS[preset]}. ` : "";
@@ -142,8 +172,8 @@ function composePrompt(prompt: string, preset?: keyof typeof PRESETS): string {
 }
 
 /**
- * Starts a text-to-image concept. Replicate answers with a prediction id that
- * the client polls; Ruvicode answers with the finished image immediately.
+ * Starts a preview. Replicate answers with a prediction id that the client
+ * polls; Ruvicode answers with the finished image in the same request.
  */
 export async function POST(request: NextRequest) {
   const config = resolveProvider();
@@ -155,7 +185,7 @@ export async function POST(request: NextRequest) {
   }
 
   const contentLength = Number(request.headers.get("content-length") ?? "0");
-  if (contentLength > MAX_REQUEST_BYTES) return fail("bad_request", 413);
+  if (contentLength > MAX_REQUEST_BYTES) return fail("image_too_large", 413);
 
   let formData: FormData;
   try {
@@ -167,7 +197,9 @@ export async function POST(request: NextRequest) {
   const parsed = promptSchema.safeParse({
     prompt: formData.get("prompt") ?? "",
     locale: formData.get("locale") ?? "id",
+    mode: formData.get("mode") || undefined,
     preset: formData.get("preset") || undefined,
+    strength: formData.get("strength") ?? undefined,
   });
 
   if (!parsed.success) {
@@ -175,15 +207,33 @@ export async function POST(request: NextRequest) {
     return fail(hasPromptField ? "invalid_prompt" : "bad_request", 422);
   }
 
-  const { prompt, preset } = parsed.data;
+  const { prompt, preset, strength, mode } = parsed.data;
   const normalized = prompt.toLowerCase();
 
   if (BLOCKED_TERMS.some((term) => normalized.includes(term))) {
     return fail("blocked_prompt", 422);
   }
 
+  let bytes: Uint8Array | undefined;
+  let mime: "image/jpeg" | "image/png" | "image/webp" | undefined;
+
+  if (mode === "edit") {
+    const image = formData.get("image");
+    if (!(image instanceof File)) return fail("invalid_image", 422);
+    if (image.size > MAX_IMAGE_BYTES) return fail("image_too_large", 413);
+
+    bytes = new Uint8Array(await image.arrayBuffer());
+    const detected = sniffImageMime(bytes);
+    if (!detected) return fail("invalid_image", 422);
+    mime = detected;
+  }
+
   const result = await startPreview(config, {
+    mode,
+    bytes,
+    mime,
     prompt: composePrompt(prompt, preset),
+    strength,
   });
 
   if (!result.ok) return providerFailure(result.error);
