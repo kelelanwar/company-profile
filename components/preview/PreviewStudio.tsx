@@ -321,6 +321,7 @@ export function PreviewStudio({ locale, dict }: Props) {
             >
               <input
                 ref={inputRef}
+                id="preview-image-input"
                 type="file"
                 accept={ACCEPTED.join(",")}
                 className="sr-only"
@@ -340,19 +341,17 @@ export function PreviewStudio({ locale, dict }: Props) {
                     sizes="(min-width: 1024px) 45vw, 100vw"
                     className="object-cover"
                   />
-                  <button
-                    type="button"
-                    onClick={() => inputRef.current?.click()}
-                    className="absolute bottom-3 right-3 border border-white/25 bg-ink/80 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-bone backdrop-blur transition-colors hover:border-copper hover:text-copper-hi"
+                  <label
+                    htmlFor="preview-image-input"
+                    className="absolute bottom-3 right-3 cursor-pointer border border-white/25 bg-ink/80 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-bone backdrop-blur transition-colors hover:border-copper hover:text-copper-hi"
                   >
                     {copy.replaceCta}
-                  </button>
+                  </label>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => inputRef.current?.click()}
-                  className={`flex aspect-[4/3] w-full flex-col items-center justify-center gap-3 border border-dashed px-6 text-center transition-colors ${
+                <label
+                  htmlFor="preview-image-input"
+                  className={`flex aspect-[4/3] w-full cursor-pointer flex-col items-center justify-center gap-3 border border-dashed px-6 text-center transition-colors ${
                     dragging ? "border-copper bg-copper/5" : "border-line hover:border-copper/60"
                   }`}
                 >
@@ -366,7 +365,7 @@ export function PreviewStudio({ locale, dict }: Props) {
                   <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-bone">
                     {copy.uploadCta}
                   </span>
-                </button>
+                </label>
               )}
             </div>
           </>
