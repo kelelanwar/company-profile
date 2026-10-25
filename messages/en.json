@@ -399,7 +399,8 @@
         "generateAlt": "AI generated room concept",
         "resultTitleEdit": "Before / after",
         "resultTitleGenerate": "Concept result",
-        "whatsappCta": "Discuss on WhatsApp"
+        "whatsappCta": "Discuss on WhatsApp",
+        "notConfigured": "AI preview is not enabled in this environment. Add a provider key (e.g. FAL_KEY) to .env.local, then restart the server."
       },
       "errors": {
         "rate_limited": "Too many requests. Wait a minute and try again.",

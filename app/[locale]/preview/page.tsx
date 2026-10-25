@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { PreviewStudio } from "@/components/preview/PreviewStudio";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getDictionary, hasLocale } from "@/lib/i18n";
+import { previewConfigured } from "@/lib/preview/config";
 
 export async function generateMetadata({
   params,
@@ -36,7 +37,11 @@ export default async function PreviewPage({
         description={dict.pages.preview.description}
       />
       <section className="shell py-14 md:py-16">
-        <PreviewStudio locale={locale} dict={dict.pages.preview} />
+        <PreviewStudio
+          locale={locale}
+          dict={dict.pages.preview}
+          configured={previewConfigured()}
+        />
       </section>
     </>
   );

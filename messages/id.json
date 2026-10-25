@@ -399,7 +399,8 @@
         "generateAlt": "Konsep ruangan hasil AI",
         "resultTitleEdit": "Sebelum / sesudah",
         "resultTitleGenerate": "Hasil konsep",
-        "whatsappCta": "Diskusikan via WhatsApp"
+        "whatsappCta": "Diskusikan via WhatsApp",
+        "notConfigured": "Pratinjau AI belum aktif di lingkungan ini. Tambahkan kunci penyedia (mis. FAL_KEY) di .env.local, lalu mulai ulang server."
       },
       "errors": {
         "rate_limited": "Terlalu banyak permintaan. Tunggu satu menit lalu coba lagi.",

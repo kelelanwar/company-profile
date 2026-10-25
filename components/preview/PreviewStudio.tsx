@@ -14,6 +14,8 @@ type ErrorCode = keyof ErrorCopy;
 type Props = {
   locale: Locale;
   dict: Dictionary["pages"]["preview"];
+  /** False when no provider key is present; shows a setup banner. */
+  configured: boolean;
 };
 
 type Status = "idle" | "preparing" | "starting" | "processing" | "done" | "error";
@@ -72,7 +74,7 @@ async function prepareImage(file: File): Promise<File> {
   return new File([blob], "room.jpg", { type: "image/jpeg" });
 }
 
-export function PreviewStudio({ locale, dict }: Props) {
+export function PreviewStudio({ locale, dict, configured }: Props) {
   const copy = dict.form;
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -258,7 +260,17 @@ export function PreviewStudio({ locale, dict }: Props) {
     status === "preparing" || status === "starting" ? copy.working : copy.rendering;
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">
+    <>
+      {!configured ? (
+        <div className="mb-6 flex items-start gap-3 border border-copper/40 bg-copper/5 px-4 py-3">
+          <span aria-hidden="true" className="mt-0.5 font-mono text-[11px] text-copper">
+            !
+          </span>
+          <p className="text-sm leading-relaxed text-bone/85">{copy.notConfigured}</p>
+        </div>
+      ) : null}
+
+      <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">
       <div className="border border-line bg-surface p-6 md:p-8">
         <div className="flex items-center justify-between gap-4">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-copper">
@@ -588,7 +600,8 @@ export function PreviewStudio({ locale, dict }: Props) {
 
         <p className="mt-5 text-xs leading-relaxed text-muted/70">{dict.notice}</p>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
