@@ -84,6 +84,7 @@ export function PreviewStudio({ locale, dict, configured }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);
+  const [quotaResetAt, setQuotaResetAt] = useState<string | null>(null);
   const [compare, setCompare] = useState(50);
   const [dragging, setDragging] = useState(false);
 
@@ -162,6 +163,7 @@ export function PreviewStudio({ locale, dict, configured }: Props) {
     abortRef.current = controller;
 
     setErrorCode(null);
+    setQuotaResetAt(null);
     setResultUrl(null);
     setStatus("starting");
 
@@ -182,6 +184,7 @@ export function PreviewStudio({ locale, dict, configured }: Props) {
       if (!response.ok) {
         const payload: unknown = await response.json().catch(() => null);
         setErrorCode(readErrorCode(payload) ?? "provider_error");
+        setQuotaResetAt(readQuotaReset(payload));
         setStatus("error");
         return;
       }
@@ -218,6 +221,7 @@ export function PreviewStudio({ locale, dict, configured }: Props) {
         if (!poll.ok) {
           const payload: unknown = await poll.json().catch(() => null);
           setErrorCode(readErrorCode(payload) ?? "provider_error");
+          setQuotaResetAt(readQuotaReset(payload));
           setStatus("error");
           return;
         }
@@ -572,6 +576,11 @@ export function PreviewStudio({ locale, dict, configured }: Props) {
               <p className="max-w-sm text-sm leading-relaxed text-bone/85">
                 {dict.errors[errorCode]}
               </p>
+              {quotaResetAt ? (
+                <p className="max-w-sm border-l-2 border-copper/60 pl-3 text-xs leading-relaxed text-muted">
+                  {dict.errors.quotaReset.replace("{time}", formatResetTime(quotaResetAt, locale))}
+                </p>
+              ) : null}
               <button type="button" onClick={() => void submit()} className={btnGhost}>
                 {copy.submit}
               </button>
@@ -603,6 +612,26 @@ export function PreviewStudio({ locale, dict, configured }: Props) {
       </div>
     </>
   );
+}
+
+function formatResetTime(value: string, locale: Locale): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "id-ID", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function readQuotaReset(payload: unknown): string | null {
+  if (typeof payload !== "object" || payload === null) return null;
+  const error = (payload as { error?: unknown }).error;
+  if (typeof error !== "object" || error === null) return null;
+  const resetAt = (error as { resetAt?: unknown }).resetAt;
+  return typeof resetAt === "string" ? resetAt : null;
 }
 
 function readErrorCode(payload: unknown): ErrorCode | null {

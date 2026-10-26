@@ -413,7 +413,8 @@
         "network": "The connection dropped. Check your network and try again.",
         "timeout": "The preview is taking longer than usual. Please try again.",
         "unknown": "Something went wrong. Please try again.",
-        "model_unavailable": "This mode is not available from the AI provider right now. Try the other mode or contact us."
+        "model_unavailable": "This mode is not available from the AI provider right now. Try the other mode or contact us.",
+        "quotaReset": "The AI provider limit was reached. It becomes available again at {time}."
       }
     }
   },

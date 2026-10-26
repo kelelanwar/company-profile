@@ -15,6 +15,12 @@ export type ProviderFailure =
   | "model_unavailable"
   | "provider_error";
 
+/** Failure detail, e.g. when the provider quota resets. */
+export type ProviderError = {
+  code: ProviderFailure;
+  resetAt?: string;
+};
+
 export type StartInput = {
   mode: PreviewMode;
   /** Prompt already composed with the preset style. */
@@ -32,7 +38,7 @@ export type StartResult =
 
 export type Outcome<T> =
   | { ok: true; value: T }
-  | { ok: false; error: ProviderFailure };
+  | { ok: false; error: ProviderError };
 
 const REPLICATE_MODEL = "stability-ai/sdxl";
 
@@ -77,6 +83,31 @@ export function resolveProvider(): ProviderConfig | null {
   if (ruvicodeKey) return { provider: "ruvicode", key: ruvicodeKey };
   if (replicateKey) return { provider: "replicate", key: replicateKey };
   return null;
+}
+
+/** Every configured provider, in fallback order. */
+export function resolveProviders(): ProviderConfig[] {
+  const requested = process.env.PREVIEW_PROVIDER?.trim().toLowerCase();
+  const single = resolveProvider();
+
+  if (requested || !single) return single ? [single] : [];
+
+  const chain: ProviderConfig[] = [];
+
+  if (process.env.FAL_KEY?.trim()) {
+    chain.push({ provider: "fal", key: process.env.FAL_KEY.trim() });
+  }
+  if (compatReady()) {
+    chain.push({ provider: "compat", key: compatKey() });
+  }
+  if (process.env.RUVICODE_API_KEY?.trim()) {
+    chain.push({ provider: "ruvicode", key: process.env.RUVICODE_API_KEY.trim() });
+  }
+  if (process.env.REPLICATE_API_TOKEN?.trim()) {
+    chain.push({ provider: "replicate", key: process.env.REPLICATE_API_TOKEN.trim() });
+  }
+
+  return chain.length > 0 ? chain : [single];
 }
 
 export async function startPreview(
@@ -137,6 +168,30 @@ function mapCompatStatus(status: number, body: string): ProviderFailure {
   return "provider_error";
 }
 
+/** Pulls a quota reset timestamp out of an upstream error body. */
+function readQuotaReset(body: string): string | undefined {
+  // The upstream body embeds a JSON string, so keys and values can be escaped.
+  if (body.includes("quotaResetTimeStamp")) {
+    const stamp = body.match(
+      /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z)/,
+    )?.[1];
+    if (stamp) return stamp;
+  }
+
+  if (body.includes("quotaResetDelay")) {
+    const duration = body.match(/(\d+)h(\d+)m(\d+(?:\.\d+)?)s/);
+    if (duration) {
+      const seconds =
+        Number(duration[1]) * 3600 + Number(duration[2]) * 60 + Number(duration[3]);
+      if (Number.isFinite(seconds)) {
+        return new Date(Date.now() + seconds * 1000).toISOString();
+      }
+    }
+  }
+
+  return undefined;
+}
+
 function readCompatImage(payload: unknown): string | null {
   if (typeof payload !== "object" || payload === null) return null;
 
@@ -178,7 +233,7 @@ async function startCompat(
   const base = compatBaseUrl();
   const model = compatModel(input.mode);
 
-  if (!base || !model) return { ok: false, error: "provider_error" };
+  if (!base || !model) return { ok: false, error: { code: "provider_error" } };
 
   const body: Record<string, unknown> = {
     model,
@@ -188,7 +243,7 @@ async function startCompat(
   };
 
   if (input.mode === "edit") {
-    if (!input.bytes || !input.mime) return { ok: false, error: "provider_error" };
+    if (!input.bytes || !input.mime) return { ok: false, error: { code: "provider_error" } };
     body.image = `data:${input.mime};base64,${Buffer.from(input.bytes).toString("base64")}`;
   }
 
@@ -205,19 +260,24 @@ async function startCompat(
     });
 
     if (!response.ok) {
-      const failure = mapCompatStatus(response.status, await response.text());
+      const body = await response.text();
+      const failure = mapCompatStatus(response.status, body);
+      const resetAt = failure === "rate_limited" ? readQuotaReset(body) : undefined;
       console.error("[preview] compat error", response.status, failure);
-      return { ok: false, error: failure };
+      return {
+        ok: false,
+        error: resetAt ? { code: failure, resetAt } : { code: failure },
+      };
     }
 
     const payload: unknown = await response.json();
     const imageUrl = readCompatImage(payload);
-    if (!imageUrl) return { ok: false, error: "provider_error" };
+    if (!imageUrl) return { ok: false, error: { code: "provider_error" } };
 
     return { ok: true, value: { kind: "image", imageUrl } };
   } catch (error) {
     console.error("[preview] compat error", error instanceof Error ? error.name : "unknown");
-    return { ok: false, error: "provider_error" };
+    return { ok: false, error: { code: "provider_error" } };
   }
 }
 
@@ -291,7 +351,7 @@ async function startFal(
 
     if (input.mode === "edit") {
       if (!input.bytes || !input.mime) {
-        return { ok: false, error: "provider_error" };
+        return { ok: false, error: { code: "provider_error" } };
       }
 
       // fal needs a URL, so the upload is staged on fal storage first.
@@ -309,7 +369,7 @@ async function startFal(
   } catch (error) {
     const failure = mapFalError(error);
     console.error("[preview] fal error", failure);
-    return { ok: false, error: failure };
+    return { ok: false, error: { code: failure } };
   }
 }
 
@@ -356,7 +416,7 @@ async function startRuvicode(
 
   if (isEdit) {
     if (!input.bytes || !input.mime) {
-      return { ok: false, error: "provider_error" };
+      return { ok: false, error: { code: "provider_error" } };
     }
 
     const form = new FormData();
@@ -401,24 +461,24 @@ async function startRuvicode(
       cache: "no-store",
     });
   } catch {
-    return { ok: false, error: "provider_error" };
+    return { ok: false, error: { code: "provider_error" } };
   }
 
   if (!response.ok) {
     const failure = mapRuvicodeStatus(response.status, await readErrorType(response));
     console.error("[preview] ruvicode error", response.status, endpoint, failure);
-    return { ok: false, error: failure };
+    return { ok: false, error: { code: failure } };
   }
 
   let payload: unknown;
   try {
     payload = await response.json();
   } catch {
-    return { ok: false, error: "provider_error" };
+    return { ok: false, error: { code: "provider_error" } };
   }
 
   const base64 = readRuvicodeImage(payload);
-  if (!base64) return { ok: false, error: "provider_error" };
+  if (!base64) return { ok: false, error: { code: "provider_error" } };
 
   const format = readRuvicodeFormat(payload);
   return { ok: true, value: { kind: "image", imageUrl: `data:image/${format};base64,${base64}` } };
@@ -454,7 +514,7 @@ async function startReplicate(
     return { ok: true, value: { kind: "pending", id: prediction.id } };
   } catch (error) {
     console.error("[preview] replicate error", error instanceof Error ? error.name : "unknown");
-    return { ok: false, error: "provider_error" };
+    return { ok: false, error: { code: "provider_error" } };
   }
 }
 
@@ -465,7 +525,7 @@ export async function pollPreview(
 ): Promise<Outcome<{ status: string; imageUrl: string | null }>> {
   if (config.provider === "fal") {
     const job = parseFalJob(id);
-    if (!job) return { ok: false, error: "provider_error" };
+    if (!job) return { ok: false, error: { code: "provider_error" } };
 
     const client = falClient(config.key);
     const model = falModel(job.mode);
@@ -493,12 +553,12 @@ export async function pollPreview(
         },
       };
     } catch (error) {
-      return { ok: false, error: mapFalError(error) };
+      return { ok: false, error: { code: mapFalError(error) } };
     }
   }
 
   if (config.provider !== "replicate") {
-    return { ok: false, error: "provider_error" };
+    return { ok: false, error: { code: "provider_error" } };
   }
 
   try {
@@ -517,7 +577,7 @@ export async function pollPreview(
       },
     };
   } catch {
-    return { ok: false, error: "provider_error" };
+    return { ok: false, error: { code: "provider_error" } };
   }
 }
 

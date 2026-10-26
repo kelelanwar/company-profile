@@ -413,7 +413,8 @@
         "network": "Koneksi terputus. Periksa jaringan lalu coba lagi.",
         "timeout": "Pratinjau memakan waktu lebih lama dari biasanya. Coba lagi.",
         "unknown": "Terjadi kesalahan. Coba lagi.",
-        "model_unavailable": "Mode ini sedang tidak tersedia di penyedia AI. Coba mode lain atau hubungi kami."
+        "model_unavailable": "Mode ini sedang tidak tersedia di penyedia AI. Coba mode lain atau hubungi kami.",
+        "quotaReset": "Batas pemakaian penyedia AI tercapai. Kembali tersedia pukul {time}."
       }
     }
   },

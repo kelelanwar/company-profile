@@ -3,9 +3,10 @@ import { z } from "zod";
 import {
   pollPreview,
   resolveProvider,
+  resolveProviders,
   startPreview,
   type PreviewMode,
-  type ProviderFailure,
+  type ProviderError,
 } from "@/lib/preview/providers";
 
 export const maxDuration = 60;
@@ -58,8 +59,8 @@ const ERROR_MESSAGES: Record<ErrorCode, { id: string; en: string }> = {
     en: "The AI preview service is not configured yet. Reach us on WhatsApp.",
   },
   rate_limited: {
-    id: "Terlalu banyak permintaan. Coba lagi dalam satu menit.",
-    en: "Too many requests. Please try again in a minute.",
+    id: "Batas pemakaian penyedia AI tercapai, atau terlalu banyak permintaan. Coba lagi beberapa saat.",
+    en: "The AI provider limit was reached, or there were too many requests. Please try again later.",
   },
   invalid_image: {
     id: "Format gambar harus JPG, PNG, atau WebP.",
@@ -126,17 +127,32 @@ function clientIp(request: NextRequest): string {
   return request.headers.get("x-real-ip") ?? "unknown";
 }
 
-function fail(code: ErrorCode, status: number, extra?: Record<string, string>) {
+function fail(
+  code: ErrorCode,
+  status: number,
+  extra?: Record<string, string>,
+  details?: { resetAt?: string },
+) {
   return NextResponse.json(
-    { error: { code, message: ERROR_MESSAGES[code] } },
+    {
+      error: {
+        code,
+        message: ERROR_MESSAGES[code],
+        ...(details?.resetAt ? { resetAt: details.resetAt } : {}),
+      },
+    },
     { status, headers: { "cache-control": "no-store", ...extra } },
   );
 }
 
-function providerFailure(error: ProviderFailure) {
-  if (error === "content_policy") return fail("blocked_prompt", 422);
-  if (error === "rate_limited") return fail("rate_limited", 429);
-  if (error === "model_unavailable") return fail("model_unavailable", 503);
+function providerFailure(error: ProviderError) {
+  const details = error.resetAt ? { resetAt: error.resetAt } : undefined;
+
+  if (error.code === "content_policy") return fail("blocked_prompt", 422);
+  if (error.code === "rate_limited") return fail("rate_limited", 429, undefined, details);
+  if (error.code === "model_unavailable") {
+    return fail("model_unavailable", 503, undefined, details);
+  }
   return fail("provider_error", 502);
 }
 
@@ -186,8 +202,8 @@ function composePrompt(
  * polls; Ruvicode answers with the finished image in the same request.
  */
 export async function POST(request: NextRequest) {
-  const config = resolveProvider();
-  if (!config) return fail("missing_token", 503);
+  const providers = resolveProviders();
+  if (providers.length === 0) return fail("missing_token", 503);
 
   const limit = rateLimit(`create:${clientIp(request)}`, RATE_LIMIT, RATE_WINDOW_MS);
   if (limit.limited) {
@@ -238,27 +254,42 @@ export async function POST(request: NextRequest) {
     mime = detected;
   }
 
-  const result = await startPreview(config, {
-    mode,
-    bytes,
-    mime,
-    prompt: composePrompt(prompt, preset, mode),
-    strength,
-  });
+  let lastError: ProviderError = { code: "provider_error" };
 
-  if (!result.ok) return providerFailure(result.error);
+  for (const config of providers) {
+    const result = await startPreview(config, {
+      mode,
+      bytes,
+      mime,
+      prompt: composePrompt(prompt, preset, mode),
+      strength,
+    });
 
-  if (result.value.kind === "image") {
-    return NextResponse.json(
-      { status: "succeeded", imageUrl: result.value.imageUrl },
-      { headers: { "cache-control": "no-store" } },
-    );
+    if (result.ok) {
+      if (result.value.kind === "image") {
+        return NextResponse.json(
+          { status: "succeeded", imageUrl: result.value.imageUrl },
+          { headers: { "cache-control": "no-store" } },
+        );
+      }
+
+      return NextResponse.json(
+        { status: "starting", predictionId: result.value.id },
+        { headers: { "cache-control": "no-store" } },
+      );
+    }
+
+    lastError = result.error;
+
+    const retryable =
+      result.error.code === "rate_limited" ||
+      result.error.code === "model_unavailable";
+    if (!retryable) break;
+
+    console.error("[preview] provider unavailable, trying next:", config.provider);
   }
 
-  return NextResponse.json(
-    { status: "starting", predictionId: result.value.id },
-    { headers: { "cache-control": "no-store" } },
-  );
+  return providerFailure(lastError);
 }
 
 /** Polls a Replicate prediction. Ruvicode returns the image from POST directly. */
@@ -266,8 +297,11 @@ export async function GET(request: NextRequest) {
   const config = resolveProvider();
   if (!config) return fail("missing_token", 503);
 
-  // Ruvicode answers synchronously; only fal and Replicate need polling.
-  if (config.provider === "ruvicode") return fail("bad_request", 400);
+  // Ruvicode and OpenAI-compatible gateways answer synchronously;
+  // only fal and Replicate need polling.
+  if (config.provider === "ruvicode" || config.provider === "compat") {
+    return fail("bad_request", 400);
+  }
 
   const limit = rateLimit(`poll:${clientIp(request)}`, POLL_RATE_LIMIT, RATE_WINDOW_MS);
   if (limit.limited) {
