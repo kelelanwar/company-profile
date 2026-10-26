@@ -176,12 +176,14 @@ The browser never sees the API token and never calls a provider directly.
 
 | Provider | Env | Edit | Generate | Transport |
 | --- | --- | --- | --- | --- |
-| **fal** (default when key exists) | `FAL_KEY` | `FAL_MODEL_EDIT` (default `fal-ai/flux-pro/kontext`) | `FAL_MODEL_GENERATE` (default `fal-ai/flux/schnell`) | queue + polling, photo staged on fal storage |
+| **fal** (paid) | `FAL_KEY` | `FAL_MODEL_EDIT` (default `fal-ai/flux-pro/kontext`) | `FAL_MODEL_GENERATE` (default `fal-ai/flux/schnell`) | queue + polling, photo staged on fal storage |
+| **compat** (OpenAI-compatible gateway, e.g. 9router) | `COMPAT_BASE_URL`, `COMPAT_MODEL`, optional `COMPAT_API_KEY` | same endpoint with an `image` data URL | `POST /images/generations` | synchronous, base64/URL response |
 | Ruvicode | `RUVICODE_API_KEY` | `ruvicode-image-edit` (often unavailable) | `ruvicode-image` | synchronous, data URL |
 | Replicate | `REPLICATE_API_TOKEN` | SDXL img2img | SDXL text2img | prediction + polling |
 
-Selection: `PREVIEW_PROVIDER=fal|ruvicode|replicate` forces one. Without it the
-app picks fal, then Ruvicode, then Replicate, whichever key exists.
+Selection: `PREVIEW_PROVIDER=fal|compat|ruvicode|replicate` forces one. Without it
+the app picks fal, then compat, then Ruvicode, then Replicate, whichever is
+configured.
 
 Optional overrides:
 
@@ -191,6 +193,33 @@ FAL_MODEL_GENERATE=fal-ai/flux/schnell
 RUVICODE_MODEL=ruvicode-image
 RUVICODE_BASE_URL=https://api.ruvicode.com/v1
 ```
+
+### OpenAI-compatible gateway (9router)
+
+[9router](https://9router.com) runs locally and exposes an OpenAI-compatible API
+at `http://localhost:20128/v1`. The adapter uses `/images/generations` for both
+modes: edit passes the photo as `image: "data:image/jpeg;base64,…"`, which
+9router maps to `image_url`.
+
+```bash
+PREVIEW_PROVIDER=compat
+COMPAT_BASE_URL=http://localhost:20128/v1
+COMPAT_API_KEY=sk-...
+COMPAT_MODEL=ag/gemini-3.1-flash-image
+# COMPAT_EDIT_MODEL=ag/gemini-3.1-flash-image
+```
+
+Notes:
+
+- The model must be an **image** model that 9router can reach. `/v1/models` may
+  only list chat models; image ids such as `ag/gemini-3.1-flash-image` can still
+  work (verify with a direct curl).
+- 9router is local, so the Next.js server must run on the same machine. For a
+  deployed site use a tunnel or host the router.
+- Provider quotas apply: an upstream `429` is surfaced as the localized
+  "limit reached" message.
+- Using subscription/OAuth accounts as an API gateway may violate the provider's
+  terms; use official keys for client work.
 
 ### fal cost notes
 

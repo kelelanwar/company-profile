@@ -403,7 +403,7 @@
         "notConfigured": "Pratinjau AI belum aktif di lingkungan ini. Tambahkan kunci penyedia (mis. FAL_KEY) di .env.local, lalu mulai ulang server."
       },
       "errors": {
-        "rate_limited": "Terlalu banyak permintaan. Tunggu satu menit lalu coba lagi.",
+        "rate_limited": "Batas pemakaian penyedia AI tercapai, atau terlalu banyak permintaan. Coba lagi beberapa saat.",
         "invalid_image": "Gunakan gambar JPG, PNG, atau WebP.",
         "image_too_large": "Ukuran gambar maksimal 5 MB.",
         "invalid_prompt": "Tuliskan arahan 3–500 karakter.",

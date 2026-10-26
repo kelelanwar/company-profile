@@ -403,7 +403,7 @@
         "notConfigured": "AI preview is not enabled in this environment. Add a provider key (e.g. FAL_KEY) to .env.local, then restart the server."
       },
       "errors": {
-        "rate_limited": "Too many requests. Wait a minute and try again.",
+        "rate_limited": "The AI provider limit was reached, or there were too many requests. Please try again later.",
         "invalid_image": "Please use a JPG, PNG, or WebP image.",
         "image_too_large": "The image must be 5 MB or smaller.",
         "invalid_prompt": "Describe the direction in 3–500 characters.",

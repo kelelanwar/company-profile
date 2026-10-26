@@ -1,7 +1,7 @@
 import Replicate from "replicate";
 import { ApiError, fal } from "@fal-ai/client";
 
-export type PreviewProvider = "fal" | "ruvicode" | "replicate";
+export type PreviewProvider = "compat" | "fal" | "ruvicode" | "replicate";
 export type PreviewMode = "edit" | "generate";
 
 export type ProviderConfig = {
@@ -55,6 +55,10 @@ export function resolveProvider(): ProviderConfig | null {
   const ruvicodeKey = process.env.RUVICODE_API_KEY?.trim();
   const replicateKey = process.env.REPLICATE_API_TOKEN?.trim();
 
+  if (requested === "compat") {
+    return compatReady() ? { provider: "compat", key: compatKey() } : null;
+  }
+
   if (requested === "fal") {
     return falKey ? { provider: "fal", key: falKey } : null;
   }
@@ -67,8 +71,9 @@ export function resolveProvider(): ProviderConfig | null {
     return replicateKey ? { provider: "replicate", key: replicateKey } : null;
   }
 
-  // No explicit provider: use whichever key is configured, fal first.
+  // No explicit provider: pick whichever is configured, fal first.
   if (falKey) return { provider: "fal", key: falKey };
+  if (compatReady()) return { provider: "compat", key: compatKey() };
   if (ruvicodeKey) return { provider: "ruvicode", key: ruvicodeKey };
   if (replicateKey) return { provider: "replicate", key: replicateKey };
   return null;
@@ -78,10 +83,142 @@ export async function startPreview(
   config: ProviderConfig,
   input: StartInput,
 ): Promise<Outcome<StartResult>> {
+  if (config.provider === "compat") return startCompat(config.key, input);
   if (config.provider === "fal") return startFal(config.key, input);
   return config.provider === "ruvicode"
     ? startRuvicode(config.key, input)
     : startReplicate(config.key, input);
+}
+
+/** OpenAI-compatible gateways (9router, LM Studio, etc.). */
+function compatBaseUrl(): string | null {
+  const raw = process.env.COMPAT_BASE_URL?.trim();
+  return raw ? raw.replace(/\/+$/, "") : null;
+}
+
+function compatKey(): string {
+  return process.env.COMPAT_API_KEY?.trim() ?? "";
+}
+
+function compatReady(): boolean {
+  return Boolean(compatBaseUrl() && process.env.COMPAT_MODEL?.trim());
+}
+
+function compatModel(mode: PreviewMode): string | null {
+  if (mode === "edit") {
+    return (
+      process.env.COMPAT_EDIT_MODEL?.trim() ||
+      process.env.COMPAT_MODEL?.trim() ||
+      null
+    );
+  }
+
+  return process.env.COMPAT_MODEL?.trim() || null;
+}
+
+function mapCompatStatus(status: number, body: string): ProviderFailure {
+  if (status === 429) return "rate_limited";
+
+  if (status === 400 || status === 404) {
+    const text = body.toLowerCase();
+    if (
+      text.includes("credentials") ||
+      text.includes("not found") ||
+      text.includes("not available") ||
+      text.includes("no provider")
+    ) {
+      return "model_unavailable";
+    }
+    if (text.includes("safety") || text.includes("content policy") || text.includes("blocked")) {
+      return "content_policy";
+    }
+  }
+
+  return "provider_error";
+}
+
+function readCompatImage(payload: unknown): string | null {
+  if (typeof payload !== "object" || payload === null) return null;
+
+  const record = payload as { data?: unknown; images?: unknown };
+
+  const data = Array.isArray(record.data) ? record.data : [];
+  for (const item of data) {
+    if (typeof item !== "object" || item === null) continue;
+    const entry = item as { b64_json?: unknown; url?: unknown };
+
+    if (typeof entry.b64_json === "string" && entry.b64_json.length > 0) {
+      const head = Buffer.from(entry.b64_json.slice(0, 16), "base64");
+      const mime =
+        head[0] === 0xff && head[1] === 0xd8
+          ? "image/jpeg"
+          : head[0] === 0x89 && head[1] === 0x50
+            ? "image/png"
+            : "image/jpeg";
+      return `data:${mime};base64,${entry.b64_json}`;
+    }
+
+    if (typeof entry.url === "string" && entry.url.length > 0) return entry.url;
+  }
+
+  const images = Array.isArray(record.images) ? record.images : [];
+  for (const item of images) {
+    if (typeof item !== "object" || item === null) continue;
+    const url = (item as { url?: unknown }).url;
+    if (typeof url === "string" && url.length > 0) return url;
+  }
+
+  return null;
+}
+
+async function startCompat(
+  key: string,
+  input: StartInput,
+): Promise<Outcome<StartResult>> {
+  const base = compatBaseUrl();
+  const model = compatModel(input.mode);
+
+  if (!base || !model) return { ok: false, error: "provider_error" };
+
+  const body: Record<string, unknown> = {
+    model,
+    prompt: input.prompt,
+    n: 1,
+    aspect_ratio: "16:9",
+  };
+
+  if (input.mode === "edit") {
+    if (!input.bytes || !input.mime) return { ok: false, error: "provider_error" };
+    body.image = `data:${input.mime};base64,${Buffer.from(input.bytes).toString("base64")}`;
+  }
+
+  const headers: Record<string, string> = { "content-type": "application/json" };
+  if (key) headers.authorization = `Bearer ${key}`;
+
+  try {
+    const response = await fetch(`${base}/images/generations`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(50_000),
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const failure = mapCompatStatus(response.status, await response.text());
+      console.error("[preview] compat error", response.status, failure);
+      return { ok: false, error: failure };
+    }
+
+    const payload: unknown = await response.json();
+    const imageUrl = readCompatImage(payload);
+    if (!imageUrl) return { ok: false, error: "provider_error" };
+
+    return { ok: true, value: { kind: "image", imageUrl } };
+  } catch (error) {
+    console.error("[preview] compat error", error instanceof Error ? error.name : "unknown");
+    return { ok: false, error: "provider_error" };
+  }
 }
 
 const FAL_DEFAULT_EDIT_MODEL = "fal-ai/flux-pro/kontext";
