@@ -1,9 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import {
-  pollPreview,
   resolveProvider,
-  resolveProviders,
   startPreview,
   type PreviewMode,
   type ProviderError,
@@ -17,7 +15,6 @@ const MIN_PROMPT = 3;
 const MAX_PROMPT = 500;
 const RATE_LIMIT = 10;
 const RATE_WINDOW_MS = 60_000;
-const POLL_RATE_LIMIT = 240;
 
 const PRESETS = {
   industrial: "industrial interior, exposed brick, blackened steel, warm practical lighting",
@@ -161,10 +158,7 @@ const promptSchema = z.object({
   locale: z.enum(["id", "en"]).default("id"),
   mode: z.enum(["edit", "generate"]).default("edit"),
   preset: z.enum(["industrial", "warm-minimal", "japandi", "luxury", "retail"]).optional(),
-  strength: z.coerce.number().min(0.3).max(0.6).default(0.45),
 });
-
-const idSchema = z.string().regex(/^[a-z0-9:_-]{8,160}$/i);
 
 function sniffImageMime(
   bytes: Uint8Array,
@@ -198,12 +192,12 @@ function composePrompt(
 }
 
 /**
- * Starts a preview. Replicate answers with a prediction id that the client
- * polls; Ruvicode answers with the finished image in the same request.
+ * Starts a preview. Ruvicode answers with the finished image in the same
+ * request, so there is nothing to poll.
  */
 export async function POST(request: NextRequest) {
-  const providers = resolveProviders();
-  if (providers.length === 0) return fail("missing_token", 503);
+  const config = resolveProvider();
+  if (!config) return fail("missing_token", 503);
 
   const limit = rateLimit(`create:${clientIp(request)}`, RATE_LIMIT, RATE_WINDOW_MS);
   if (limit.limited) {
@@ -225,7 +219,6 @@ export async function POST(request: NextRequest) {
     locale: formData.get("locale") ?? "id",
     mode: formData.get("mode") || undefined,
     preset: formData.get("preset") || undefined,
-    strength: formData.get("strength") ?? undefined,
   });
 
   if (!parsed.success) {
@@ -233,7 +226,7 @@ export async function POST(request: NextRequest) {
     return fail(hasPromptField ? "invalid_prompt" : "bad_request", 422);
   }
 
-  const { prompt, preset, strength, mode } = parsed.data;
+  const { prompt, preset, mode } = parsed.data;
   const normalized = prompt.toLowerCase();
 
   if (BLOCKED_TERMS.some((term) => normalized.includes(term))) {
@@ -254,79 +247,17 @@ export async function POST(request: NextRequest) {
     mime = detected;
   }
 
-  let lastError: ProviderError = { code: "provider_error" };
+  const result = await startPreview(config, {
+    mode,
+    bytes,
+    mime,
+    prompt: composePrompt(prompt, preset, mode),
+  });
 
-  for (const config of providers) {
-    const result = await startPreview(config, {
-      mode,
-      bytes,
-      mime,
-      prompt: composePrompt(prompt, preset, mode),
-      strength,
-    });
-
-    if (result.ok) {
-      if (result.value.kind === "image") {
-        return NextResponse.json(
-          { status: "succeeded", imageUrl: result.value.imageUrl },
-          { headers: { "cache-control": "no-store" } },
-        );
-      }
-
-      return NextResponse.json(
-        { status: "starting", predictionId: result.value.id },
-        { headers: { "cache-control": "no-store" } },
-      );
-    }
-
-    lastError = result.error;
-
-    const retryable =
-      result.error.code === "rate_limited" ||
-      result.error.code === "model_unavailable";
-    if (!retryable) break;
-
-    console.error("[preview] provider unavailable, trying next:", config.provider);
-  }
-
-  return providerFailure(lastError);
-}
-
-/** Polls a Replicate prediction. Ruvicode returns the image from POST directly. */
-export async function GET(request: NextRequest) {
-  const config = resolveProvider();
-  if (!config) return fail("missing_token", 503);
-
-  // Ruvicode and OpenAI-compatible gateways answer synchronously;
-  // only fal and Replicate need polling.
-  if (config.provider === "ruvicode" || config.provider === "compat") {
-    return fail("bad_request", 400);
-  }
-
-  const limit = rateLimit(`poll:${clientIp(request)}`, POLL_RATE_LIMIT, RATE_WINDOW_MS);
-  if (limit.limited) {
-    return fail("rate_limited", 429, { "retry-after": String(limit.retryAfter) });
-  }
-
-  const id = request.nextUrl.searchParams.get("id");
-  const parsedId = idSchema.safeParse(id ?? "");
-  if (!parsedId.success) return fail("not_found", 404);
-
-  const result = await pollPreview(config, parsedId.data);
   if (!result.ok) return providerFailure(result.error);
 
-  if (result.value.status === "failed" || result.value.status === "canceled") {
-    return NextResponse.json(
-      {
-        status: result.value.status,
-        error: { code: "provider_error", message: ERROR_MESSAGES.provider_error },
-      },
-      { headers: { "cache-control": "no-store" } },
-    );
-  }
-
   return NextResponse.json(
-    { status: result.value.status, imageUrl: result.value.imageUrl },
+    { status: "succeeded", imageUrl: result.value.imageUrl },
     { headers: { "cache-control": "no-store" } },
   );
 }

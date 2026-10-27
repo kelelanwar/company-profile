@@ -400,7 +400,7 @@
         "resultTitleEdit": "Before / after",
         "resultTitleGenerate": "Concept result",
         "whatsappCta": "Discuss on WhatsApp",
-        "notConfigured": "AI preview is not enabled in this environment. Add a provider key (e.g. FAL_KEY) to .env.local, then restart the server."
+        "notConfigured": "AI preview is not enabled in this environment. Add RUVICODE_API_KEY to .env.local, then restart the server."
       },
       "errors": {
         "rate_limited": "The AI provider limit was reached, or there were too many requests. Please try again later.",

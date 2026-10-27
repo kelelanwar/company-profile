@@ -3,7 +3,7 @@
 Status: Draft v0.1 — 2026-10-23
 Reference: https://intera-html.vercel.app (design + color tone reference only — do NOT clone section-by-section)
 Contact placeholder: WhatsApp +62 812-3456-7890, hello@geost.studio
-Stack: Next.js 14+ App Router + TS + Tailwind, three + R3F + drei, Replicate (SDXL img2img) server-side, bilingual id/en
+Stack: Next.js 14+ App Router + TS + Tailwind, three + R3F + drei, Ruvicode (image generation + editing) server-side, bilingual id/en
 
 ## 1. Background
 
@@ -22,7 +22,7 @@ Stack: Next.js 14+ App Router + TS + Tailwind, three + R3F + drei, Replicate (SD
 In:
 - Bilingual (`/id`, `/en`) pages: home (hero, about, services, 360 highlight, best-projects, pricing, team, testimonials, FAQ, footer), `projects`, `projects/[slug]`, `services`, `pricing`, `about`, `contact`, `preview` (AI studio).
 - 360 viewer on project detail when `.glb` exists, image gallery fallback.
-- `/api/preview` img2img: jpeg/png/webp <=5MB + prompt <=500 chars -> provider -> temp URL.
+- `/api/preview` generate + edit: jpeg/png/webp <=5MB + prompt <=500 chars -> Ruvicode -> base64 data URL.
 - Contact via form (mailto/WhatsApp link), no auth, no CMS.
 
 Out:
@@ -36,7 +36,7 @@ Out:
 - `app/[locale]/services|pricing|about|contact/page.tsx` — original Geost pages.
 - Contact CTA: WhatsApp `https://wa.me/6281234567890` + `mailto:hello@geost.studio` (placeholder, replace with real).
 - `app/[locale]/preview/page.tsx` — upload + prompt + locale + result + disclaimer.
-- `app/api/preview/route.ts` — zod validation, rate-limit 10 req/min/IP, Replicate call.
+- `app/api/preview/route.ts` — zod validation, rate-limit 10 req/min/IP, Ruvicode call.
 
 ## 5. Feature A — 360 Portfolio Viewer
 
@@ -45,13 +45,13 @@ Out:
 - **Tech** — `"use client"` `components/viewer/PortfolioViewer.tsx`, `useGLTF`, no `three` import on server, `useGLTF.preload` only above-fold.
 - **Acceptance** — loads <5s on 4G for 15MB model, orbit 60fps desktop, error state never blank, unmount disposes geometry.
 
-## 6. Feature B — AI Preview img2img
+## 6. Feature B — AI Preview (generate + edit)
 
-- **Flow** — select image -> client-side type/size check -> enter prompt (e.g. "industrial living room, brick wall") + style preset -> `POST /api/preview (multipart)` -> polling if async -> display before/after slider + download + "Consult via WhatsApp" with prompt attached.
+- **Flow** — select image -> client-side type/size check -> enter prompt (e.g. "industrial living room, brick wall") + style preset -> `POST /api/preview (multipart)` -> Ruvicode responds with the finished image -> display before/after slider + download + "Consult via WhatsApp" with prompt attached.
 - **Validation** — zod: file type jpeg/png/webp, <=5MB, prompt 3-500 chars, locale id/en; strip EXIF client-side; store in memory/`/tmp` only, never `public/`.
-- **Server keys only (`REPLICATE_API_TOKEN`, never `NEXT_PUBLIC_`), no base64/key logging, 10 req/min/IP, NSFW prompt block list, bilingual disclaimer: "AI concept preview, not final construction result / Hasil AI hanya konsep, bukan hasil akhir."
-- **Provider** — Replicate SDXL img2img (`prompt_strength` ~0.35-0.5 to preserve room layout); env `REPLICATE_API_TOKEN` server-only.
-- **Acceptance** — invalid file rejected with id/en message, 500-char limit enforced, provider failure shows retry, result URL expires notice.
+- **Server keys only (`RUVICODE_API_KEY`, never `NEXT_PUBLIC_`), no base64/key logging, 10 req/min/IP, NSFW prompt block list, bilingual disclaimer: "AI concept preview, not final construction result / Hasil AI hanya konsep, bukan hasil akhir."
+- **Provider** — Ruvicode image edit for uploaded photos (default `ruvicode-image-edit`, preserves room layout via prompt instructions) and generation for text-only concepts (default `ruvicode-image`); env `RUVICODE_API_KEY` server-only.
+- **Acceptance** — invalid file rejected with id/en message, 500-char limit enforced, provider failure shows retry, result shown immediately (data URL, no polling).
 
 ## 7. Content / i18n
 

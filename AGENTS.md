@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # AGENTS.md — company-profile
 
-Stack: Next.js 14+ App Router + TypeScript + Tailwind for Geost Studio. 3D: `three` + `@react-three/fiber` + `@react-three/drei`. AI preview: Replicate SDXL img2img via server-side Next.js Route Handlers only. Content: bilingual `id` / `en`.
+Stack: Next.js 14+ App Router + TypeScript + Tailwind for Geost Studio. 3D: `three` + `@react-three/fiber` + `@react-three/drei`. AI preview: Ruvicode image generation + editing via server-side Next.js Route Handlers only. Content: bilingual `id` / `en`.
 
 ## Commands
 
@@ -21,12 +21,12 @@ Stack: Next.js 14+ App Router + TypeScript + Tailwind for Geost Studio. 3D: `thr
 
 ## Structure (create if missing)
 
-- `app/[locale]/` — original Geost routes: `page.tsx` (hero + about + services + 360 highlight + projects + pricing + team + testimonials + FAQ), `projects/`, `projects/[slug]/`, `services/`, `pricing/`, `about/`, `contact/`, `preview/`; `app/api/preview/route.ts` — AI img2img endpoint, never call provider from client
+- `app/[locale]/` — original Geost routes: `page.tsx` (hero + about + services + 360 highlight + projects + pricing + team + testimonials + FAQ), `projects/`, `projects/[slug]/`, `services/`, `pricing/`, `about/`, `contact/`, `preview/`; `app/api/preview/route.ts` — AI generate/edit endpoint, never call Ruvicode from client
 - `components/home/` — one component per Intera section (`HeroSlider.tsx`, `ServicesGrid.tsx`, `ProjectsGallery.tsx`, `PricingTable.tsx`, `TeamGrid.tsx`, `NewsGrid.tsx`) so sections stay swappable
 - `components/viewer/` — `PortfolioViewer.tsx` wraps all R3F canvas logic
 - `public/models/*.glb` — converted portfolios only; never commit `.skp` / `.blend` / `*.max`
 - `messages/id.json`, `messages/en.json` — bilingual copy
-- `.env.local` — `REPLICATE_API_TOKEN=`; never prefix AI keys with `NEXT_PUBLIC_`
+- `.env.local` — `RUVICODE_API_KEY=`; never prefix AI keys with `NEXT_PUBLIC_`
 
 ## Reference design — https://intera-html.vercel.app (tone + palette reference only, never clone sections)
 
@@ -41,9 +41,9 @@ Stack: Next.js 14+ App Router + TypeScript + Tailwind for Geost Studio. 3D: `thr
 - Every viewer must have: loading fallback, `onError` state, `dpr={[1,2]}`, and dispose on unmount (`useGLTF.preload` only for above-fold model).
 - No server-side import of `three`; mark viewer files `"use client"`.
 
-## AI Preview (img2img) — hard rules
+## AI Preview (generate + edit) — hard rules
 
-- Flow: client uploads `image/jpeg|png|webp` (max 5 MB) + `prompt` + `locale` -> `POST /api/preview` -> Replicate -> return temporary URL. Validate with `zod` in the route.
+- Provider is Ruvicode only. Flow: client uploads `image/jpeg|png|webp` (max 5 MB) + `prompt` + `locale` -> `POST /api/preview` -> Ruvicode `/v1/images/edits` or `/v1/images/generations` -> synchronous base64 image returned as a data URL. Validate with `zod` in the route.
 - Store uploads in memory or `/tmp` only; never write client uploads to `public/`.
 - Never log base64 images or API keys. Rate-limit route (e.g. 10 req/min/IP) and add prompt max length 500 chars.
 - Show bilingual disclaimer that AI output is a concept preview, not final construction result.

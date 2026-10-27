@@ -5,7 +5,7 @@ page, project portfolio, 360° viewer (M3), and AI concept preview (M4).
 
 Stack: Next.js 16 App Router, React 19, TypeScript (strict), Tailwind CSS v4.
 3D: `three` + `@react-three/fiber` + `@react-three/drei`.
-AI: Replicate SDXL img2img through a server-side route handler.
+AI: Ruvicode image generation + editing through a server-side route handler.
 
 ## Commands
 
@@ -31,8 +31,8 @@ Verify `lint -> typecheck -> build` before opening a PR.
 | `components/layout/` | Fixed header (with locale switch) and footer |
 | `components/viewer/` | `PortfolioViewer` shell, `RoomScene` (Kenney demo), `PanoramaViewer`, `ModelScene` |
 | `components/preview/` | `PreviewStudio` — upload, prompt, presets, polling, before/after |
-| `lib/preview/providers.ts` | Ruvicode + Replicate adapters (server-only) |
-| `app/api/preview/route.ts` | Server-side img2img endpoint (POST + GET poll) |
+| `lib/preview/providers.ts` | Ruvicode adapter (server-only) |
+| `app/api/preview/route.ts` | Server-side generate/edit endpoint |
 | `messages/{id,en}.json` | All UI copy — no user-facing strings in components |
 | `data/*.json` | Projects, services, team, studio notes, and the demo room layout |
 | `assets-src/kenney/` | Unmodified Kenney furniture kit (source, CC0) |
@@ -148,13 +148,17 @@ node scripts/shot-mobile.mjs http://localhost:3000/en/projects/rumah-kubu-bandun
 
 ## AI preview (M4)
 
-`app/api/preview/route.ts` proxies image models. There are two modes:
+`app/api/preview/route.ts` proxies Ruvicode, the only image provider. There are
+two modes:
 
 - **edit** — upload a room photo plus a prompt; the model keeps the layout and
   restyles the interior.
 - **generate** — text only, one 16:9 concept image.
 
-The browser never sees the API token and never calls a provider directly.
+Ruvicode exposes OpenAI-compatible endpoints: `POST /v1/images/edits` and
+`POST /v1/images/generations`. Both answer synchronously with the finished image
+as base64, which the route returns to the browser as a data URL. The browser
+never sees the API token and never calls Ruvicode directly.
 
 ### Flow
 
@@ -163,103 +167,42 @@ The browser never sees the API token and never calls a provider directly.
    multipart form data with the prompt, locale, and preset.
 2. `POST /api/preview` validates with `zod`, checks the image signature and the
    block list, and composes the selected preset into the prompt.
-3. The provider runs the job:
-   - **fal** — the photo is staged on fal storage, a queue request is submitted,
-     and `fal:<mode>:<request_id>` is returned for polling.
-   - **Ruvicode** — synchronous `/images/edits` or `/images/generations`, image
-     returned as a data URL.
-   - **Replicate** — SDXL prediction id plus polling for a temporary URL.
+3. The route calls Ruvicode and returns `{ status: "succeeded", imageUrl }`.
+   Edit mode uses `RUVICODE_EDIT_MODEL` (default `ruvicode-image-edit`);
+   generate mode uses `RUVICODE_MODEL` (default `ruvicode-image`).
 4. The result is shown with a before/after slider (edit mode), download button,
    WhatsApp hand-off carrying the prompt, and the bilingual disclaimer.
 
-### Providers
+### Provider
 
 | Provider | Env | Edit | Generate | Transport |
 | --- | --- | --- | --- | --- |
-| **fal** (paid) | `FAL_KEY` | `FAL_MODEL_EDIT` (default `fal-ai/flux-pro/kontext`) | `FAL_MODEL_GENERATE` (default `fal-ai/flux/schnell`) | queue + polling, photo staged on fal storage |
-| **compat** (OpenAI-compatible gateway, e.g. 9router) | `COMPAT_BASE_URL`, `COMPAT_MODEL`, optional `COMPAT_API_KEY` | same endpoint with an `image` data URL | `POST /images/generations` | synchronous, base64/URL response |
-| Ruvicode | `RUVICODE_API_KEY` | `ruvicode-image-edit` (often unavailable) | `ruvicode-image` | synchronous, data URL |
-| Replicate | `REPLICATE_API_TOKEN` | SDXL img2img | SDXL text2img | prediction + polling |
+| Ruvicode | `RUVICODE_API_KEY` | `RUVICODE_EDIT_MODEL` (default `ruvicode-image-edit`) | `RUVICODE_MODEL` (default `ruvicode-image`) | synchronous `POST /v1/images/{edits,generations}`, base64 response |
 
-Selection: `PREVIEW_PROVIDER=fal|compat|ruvicode|replicate` forces one. Without it
-the app picks fal, then compat, then Ruvicode, then Replicate, whichever is
-configured.
+Available Ruvicode image models: `ruvicode-image`, `ruvicode-image-uncensored`,
+`ruvicode-image-premium`, `ruvicode-image-premium-uncensored` for generation;
+`ruvicode-image-edit`, `ruvicode-image-edit-uncensored`,
+`ruvicode-image-premium-edit`, `ruvicode-image-premium-edit-uncensored` for
+editing. Premium variants cost more and offer higher quality.
 
 Optional overrides:
 
 ```bash
-FAL_MODEL_EDIT=fal-ai/flux-pro/kontext
-FAL_MODEL_GENERATE=fal-ai/flux/schnell
-RUVICODE_MODEL=ruvicode-image
+RUVICODE_API_KEY=rvcd_...
 RUVICODE_BASE_URL=https://api.ruvicode.com/v1
+RUVICODE_MODEL=ruvicode-image
+RUVICODE_EDIT_MODEL=ruvicode-image-edit
 ```
-
-### OpenAI-compatible gateway (9router)
-
-[9router](https://9router.com) runs locally and exposes an OpenAI-compatible API
-at `http://localhost:20128/v1`. The adapter uses `/images/generations` for both
-modes: edit passes the photo as `image: "data:image/jpeg;base64,…"`, which
-9router maps to `image_url`.
-
-```bash
-PREVIEW_PROVIDER=compat
-COMPAT_BASE_URL=http://localhost:20128/v1
-COMPAT_API_KEY=sk-...
-COMPAT_MODEL=ag/gemini-3.1-flash-image
-# COMPAT_EDIT_MODEL=ag/gemini-3.1-flash-image
-```
-
-Notes:
-
-- The model must be an **image** model that 9router can reach. `/v1/models` may
-  only list chat models; image ids such as `ag/gemini-3.1-flash-image` can still
-  work (verify with a direct curl).
-- 9router is local, so the Next.js server must run on the same machine. For a
-  deployed site use a tunnel or host the router.
-- Provider quotas apply: an upstream `429` is surfaced as the localized
-  "limit reached" message.
-- Using subscription/OAuth accounts as an API gateway may violate the provider's
-  terms; use official keys for client work.
-
-### fal cost notes
-
-fal has **no free tier** — every request needs a funded key. For cheap testing
-switch the generate model:
-
-- `fal-ai/flux/schnell` — about $0.003 per megapixel (cheapest).
-- `fal-ai/flux-pro/kontext` — instruction-based edit; price is on the model page.
-- `fal-ai/flux/dev/image-to-image` — cheaper img2img alternative; its input uses
-  `strength` instead of Kontext fields, so adjust the adapter if you switch.
-
-### Testing without a key
-
-`FAL_MOCK_URL` rewrites every fal host to a local mock server, so the whole
-queue/upload flow can be exercised offline:
-
-```bash
-FAL_KEY=fal_test FAL_MOCK_URL=http://127.0.0.1:4011 PREVIEW_PROVIDER=fal npm run dev
-```
-
-The mock only needs:
-
-```
-POST /storage/upload/initiate        -> { upload_url, file_url }
-PUT  <upload_url>                    -> 200
-POST /fal-ai/<app>/<endpoint>        -> { request_id }
-GET  /fal-ai/<app>/requests/<id>/status -> { status: IN_QUEUE|IN_PROGRESS|COMPLETED }
-GET  /fal-ai/<app>/requests/<id>     -> { images: [{ url }] }
-```
-
-Never set `FAL_MOCK_URL` in production.
 
 ### Limits and guards
 
 - Upload: 5 MB, JPG/PNG/WebP, verified by magic bytes rather than the MIME header.
+  Ruvicode accepts inputs up to 20 MB, so the app limit is the tighter one.
 - Prompt: 3–500 characters plus a small bilingual block list for NSFW terms.
-- Rate limit: 10 creations/minute/IP, 240 polls/minute/IP (in-memory map; move to
-  Redis when running multiple instances).
-- Uploads stay in memory; in edit mode only fal receives a staged copy, and no
-  base64 payloads or keys are logged.
+- Rate limit: 10 creations/minute/IP (in-memory map; move to Redis when running
+  multiple instances).
+- Uploads stay in memory; requests use `store: false`, so Ruvicode does not keep
+  a copy in the account gallery. No base64 payloads or keys are logged.
 - Errors return `{ error: { code, message: { id, en } } }`; codes:
   `missing_token`, `rate_limited`, `invalid_image`, `image_too_large`,
   `invalid_prompt`, `blocked_prompt`, `model_unavailable`, `provider_error`,
@@ -269,15 +212,10 @@ Never set `FAL_MOCK_URL` in production.
 
 ```bash
 # .env.local (never commit, never prefix with NEXT_PUBLIC_)
-FAL_KEY=...
-PREVIEW_PROVIDER=fal
-
-# alternatives
-REPLICATE_API_TOKEN=
-RUVICODE_API_KEY=
+RUVICODE_API_KEY=rvcd_...
 ```
 
-Without a key the endpoint returns 503 `missing_token` and the UI shows the
+Without the key the endpoint returns 503 `missing_token` and the UI shows the
 bilingual "not configured" message, so the page stays usable in previews.
 
 ### Quick checks
@@ -286,7 +224,7 @@ bilingual "not configured" message, so the page stays usable in previews.
 curl -X POST http://localhost:3000/api/preview   -F "mode=generate" -F "prompt=industrial living room, brick wall"   -F "preset=industrial" -F "locale=en"
 
 curl -X POST http://localhost:3000/api/preview   -F "mode=edit" -F "image=@room.jpg;type=image/jpeg"   -F "prompt=exposed brick, warm lighting" -F "locale=en"
-# -> 200 with predictionId (fal/replicate) or imageUrl (ruvicode)
+# -> 200 with imageUrl
 ```
 
 ## Placeholders to replace before launch

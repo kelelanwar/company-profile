@@ -18,14 +18,12 @@ type Props = {
   configured: boolean;
 };
 
-type Status = "idle" | "preparing" | "starting" | "processing" | "done" | "error";
+type Status = "idle" | "preparing" | "starting" | "done" | "error";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const MAX_PROMPT = 500;
 const MIN_PROMPT = 3;
 const ACCEPTED = ["image/jpeg", "image/png", "image/webp"];
-const POLL_INTERVAL_MS = 2000;
-const MAX_POLLS = 50;
 
 const PRESETS: { value: Preset; label: keyof FormCopy["presets"] }[] = [
   { value: "industrial", label: "industrial" },
@@ -189,66 +187,16 @@ export function PreviewStudio({ locale, dict, configured }: Props) {
         return;
       }
 
-      const created = (await response.json()) as {
-        predictionId?: string;
-        imageUrl?: string;
-      };
+      const created = (await response.json()) as { imageUrl?: string };
 
-      if (created.imageUrl) {
-        setResultUrl(created.imageUrl);
-        setStatus("done");
-        return;
-      }
-
-      if (!created.predictionId) {
+      if (!created.imageUrl) {
         setErrorCode("provider_error");
         setStatus("error");
         return;
       }
 
-      setStatus("processing");
-
-      for (let attempt = 0; attempt < MAX_POLLS; attempt += 1) {
-        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-
-        if (controller.signal.aborted) return;
-
-        const poll = await fetch(`/api/preview?id=${created.predictionId}`, {
-          signal: controller.signal,
-          cache: "no-store",
-        });
-
-        if (!poll.ok) {
-          const payload: unknown = await poll.json().catch(() => null);
-          setErrorCode(readErrorCode(payload) ?? "provider_error");
-          setQuotaResetAt(readQuotaReset(payload));
-          setStatus("error");
-          return;
-        }
-
-        const state = (await poll.json()) as { status?: string; imageUrl?: string | null };
-
-        if (state.status === "succeeded") {
-          if (!state.imageUrl) {
-            setErrorCode("provider_error");
-            setStatus("error");
-            return;
-          }
-
-          setResultUrl(state.imageUrl);
-          setStatus("done");
-          return;
-        }
-
-        if (state.status === "failed" || state.status === "canceled") {
-          setErrorCode("provider_error");
-          setStatus("error");
-          return;
-        }
-      }
-
-      setErrorCode("timeout");
-      setStatus("error");
+      setResultUrl(created.imageUrl);
+      setStatus("done");
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
       setErrorCode("network");
@@ -256,7 +204,7 @@ export function PreviewStudio({ locale, dict, configured }: Props) {
     }
   }, [file, locale, mode, preset, prompt]);
 
-  const busy = status === "preparing" || status === "starting" || status === "processing";
+  const busy = status === "preparing" || status === "starting";
   const promptTooShort = prompt.trim().length < MIN_PROMPT;
   const canSubmit = (mode === "generate" || Boolean(file)) && !promptTooShort && !busy;
 

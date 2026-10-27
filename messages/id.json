@@ -400,7 +400,7 @@
         "resultTitleEdit": "Sebelum / sesudah",
         "resultTitleGenerate": "Hasil konsep",
         "whatsappCta": "Diskusikan via WhatsApp",
-        "notConfigured": "Pratinjau AI belum aktif di lingkungan ini. Tambahkan kunci penyedia (mis. FAL_KEY) di .env.local, lalu mulai ulang server."
+        "notConfigured": "Pratinjau AI belum aktif di lingkungan ini. Tambahkan RUVICODE_API_KEY di .env.local, lalu mulai ulang server."
       },
       "errors": {
         "rate_limited": "Batas pemakaian penyedia AI tercapai, atau terlalu banyak permintaan. Coba lagi beberapa saat.",
