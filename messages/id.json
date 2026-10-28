@@ -62,7 +62,7 @@
     "panoramaTitle": "Panorama 360°",
     "panoramaBadge": "Foto 360°",
     "panoramaHint": "Tarik untuk melihat sekeliling · cubit untuk zoom",
-    "panoramaDemoNote": "Panorama contoh dari Poly Haven (CC0) — ganti dengan foto 360° proyek asli.",
+    "panoramaDemoNote": "Panorama konsep AI berdasarkan foto portofolio — bukan dokumentasi 360° asli proyek.",
     "panoramaNote": "Foto 360° diambil dari tengah ruangan. Tarik untuk melihat sekeliling."
   },
   "home": {
@@ -421,7 +421,8 @@
   "footer": {
     "tagline": "Studio desain interior, arsitektur, dan visualisasi 360° yang berbasis di Bandung.",
     "studioLabel": "Studio",
-    "address": "Jl. Cihampelas No. 120, Bandung, Jawa Barat 40131",
+    "address": "Jalan Prof. Dr. Hamka RT 005/007, Gaga, Tangerang, Banten, 15154, Indonesia",
+    "companyByline": "by PT. INDAH SELARAS MANDIRI",
     "phoneLabel": "WhatsApp",
     "emailLabel": "Email",
     "hours": "Senin–Jumat, 09.00–18.00 WIB",

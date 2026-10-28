@@ -63,7 +63,7 @@ export function AboutSection({ locale, dict }: Props) {
           ))}
         </ul>
 
-        <Link href={`/${locale}/about`} className={`${btnGhost} mt-10`}>
+        <Link href={`/${locale}/about#how-we-work`} className={`${btnGhost} mt-10`}>
           {dict.cta}
         </Link>
       </div>

@@ -32,7 +32,7 @@ export async function generateMetadata({
 
   return {
     metadataBase: new URL(site.url),
-    title: dict.meta.home.title,
+    title: dict.nav.home,
     description: dict.meta.home.description,
     alternates: {
       canonical: `/${locale}`,

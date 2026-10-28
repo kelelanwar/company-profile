@@ -136,7 +136,7 @@ export async function ProjectDetail({ locale, project }: DetailProps) {
             ))}
           </div>
 
-          {project.modelUrl || project.demoScene ? null : (
+          {project.modelUrl || project.demoScene || project.panoramas?.length ? null : (
             <p className="mt-8 border border-line bg-surface px-5 py-4 text-sm leading-relaxed text-muted">
               {copy.viewerNotice}
             </p>

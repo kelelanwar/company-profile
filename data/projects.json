@@ -20,16 +20,10 @@
     "poster": null,
     "panoramas": [
       {
-        "image": "/images/panoramas/loft-living-360.jpg",
-        "label_id": "Ruang tinggal",
-        "label_en": "Living space",
-        "credit": "Poly Haven · CC0"
-      },
-      {
-        "image": "/images/panoramas/loft-lounge-360.jpg",
-        "label_id": "Lounge",
-        "label_en": "Lounge",
-        "credit": "Poly Haven · CC0"
+        "image": "/images/panoramas/rumah-kubu-bandung-360.jpg",
+        "label_id": "Area belakang rumah",
+        "label_en": "Rear garden",
+        "credit": "Ruvicode · AI"
       }
     ],
     "panoramaDemo": true
@@ -52,7 +46,16 @@
       "https://images.unsplash.com/photo-1416331108676-a22ccb276e35?auto=format&fit=crop&w=1400&q=80"
     ],
     "modelUrl": null,
-    "poster": null
+    "poster": null,
+    "panoramas": [
+      {
+        "image": "/images/panoramas/loft-cipete-360.jpg",
+        "label_id": "Interior loft",
+        "label_en": "Loft interior",
+        "credit": "Ruvicode · AI"
+      }
+    ],
+    "panoramaDemo": true
   },
   {
     "slug": "kantor-karsa",
@@ -72,7 +75,16 @@
       "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1400&q=80"
     ],
     "modelUrl": null,
-    "poster": null
+    "poster": null,
+    "panoramas": [
+      {
+        "image": "/images/panoramas/kantor-karsa-360.jpg",
+        "label_id": "Ruang kerja",
+        "label_en": "Workspace",
+        "credit": "Ruvicode · AI"
+      }
+    ],
+    "panoramaDemo": true
   },
   {
     "slug": "kafe-bumi",
@@ -92,7 +104,16 @@
       "https://images.unsplash.com/photo-1554435493-93422e8220c8?auto=format&fit=crop&w=1400&q=80"
     ],
     "modelUrl": null,
-    "poster": null
+    "poster": null,
+    "panoramas": [
+      {
+        "image": "/images/panoramas/kafe-bumi-360.jpg",
+        "label_id": "Area kafe",
+        "label_en": "Cafe area",
+        "credit": "Ruvicode · AI"
+      }
+    ],
+    "panoramaDemo": true
   },
   {
     "slug": "villa-ubud",
@@ -112,7 +133,16 @@
       "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1400&q=80"
     ],
     "modelUrl": null,
-    "poster": null
+    "poster": null,
+    "panoramas": [
+      {
+        "image": "/images/panoramas/villa-ubud-360.jpg",
+        "label_id": "Interior vila",
+        "label_en": "Villa interior",
+        "credit": "Ruvicode · AI"
+      }
+    ],
+    "panoramaDemo": true
   },
   {
     "slug": "showroom-arc",
@@ -132,7 +162,16 @@
       "https://images.unsplash.com/photo-1615529182904-14819c35db37?auto=format&fit=crop&w=1400&q=80"
     ],
     "modelUrl": null,
-    "poster": null
+    "poster": null,
+    "panoramas": [
+      {
+        "image": "/images/panoramas/showroom-arc-360.jpg",
+        "label_id": "Area pameran",
+        "label_en": "Exhibition space",
+        "credit": "Ruvicode · AI"
+      }
+    ],
+    "panoramaDemo": true
   },
   {
     "slug": "rumah-sintesa",
@@ -152,7 +191,16 @@
       "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1400&q=80"
     ],
     "modelUrl": null,
-    "poster": null
+    "poster": null,
+    "panoramas": [
+      {
+        "image": "/images/panoramas/rumah-sintesa-360.jpg",
+        "label_id": "Interior rumah",
+        "label_en": "House interior",
+        "credit": "Ruvicode · AI"
+      }
+    ],
+    "panoramaDemo": true
   },
   {
     "slug": "studio-geost",
@@ -173,6 +221,15 @@
     ],
     "modelUrl": null,
     "poster": null,
-    "demoScene": true
+    "demoScene": true,
+    "panoramas": [
+      {
+        "image": "/images/panoramas/studio-geost-360.jpg",
+        "label_id": "Ruang studio",
+        "label_en": "Studio space",
+        "credit": "Ruvicode · AI"
+      }
+    ],
+    "panoramaDemo": true
   }
 ]

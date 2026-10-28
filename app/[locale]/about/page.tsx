@@ -16,7 +16,7 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
 
   return {
-    title: dict.pages.about.title,
+    title: dict.nav.about,
     description: dict.pages.about.description,
   };
 }
@@ -39,7 +39,10 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
 
       <AboutSection locale={locale} dict={dict.home.about} />
 
-      <section className="border-y border-line bg-carbone py-20 md:py-24">
+      <section
+        id="how-we-work"
+        className="scroll-mt-24 border-y border-line bg-carbone py-20 md:py-24"
+      >
         <div className="shell">
           <h2 className="eyebrow">{copy.valuesTitle}</h2>
           <div className="mt-10 grid gap-px bg-line md:grid-cols-3">

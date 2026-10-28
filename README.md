@@ -118,9 +118,10 @@ drag to look around, pinch/scroll to zoom, slow auto-rotate (disabled for
 Several panoramas become tabs above the viewer. Remove `"panoramaDemo": true`
 once the photos are real project shots.
 
-The two sample panoramas (`loft-living-360.jpg`, `loft-lounge-360.jpg`) are
-tonemapped previews from [Poly Haven](https://polyhaven.com) (CC0) and are
-labelled as demo content in the UI — replace them before launch.
+All panoramas in `public/images/panoramas/` are AI concepts generated with
+Ruvicode outpainting from each project's cover photo. They are labelled as demo
+content in the UI because unseen areas are synthesized — replace them with real
+project captures before launch.
 
 ### Viewer rules
 
@@ -134,7 +135,7 @@ labelled as demo content in the UI — replace them before launch.
 - No `three` import in server components or route handlers.
 
 Furniture models: [Kenney](https://kenney.nl) Furniture Kit, CC0.
-Sample panoramas: [Poly Haven](https://polyhaven.com), CC0.
+360° panoramas: AI concepts generated with Ruvicode from portfolio cover photos.
 
 ### Visual check
 
@@ -233,8 +234,8 @@ curl -X POST http://localhost:3000/api/preview   -F "mode=edit" -F "image=@room.
 - All photography points at Unsplash URLs (`next.config.ts` `remotePatterns`);
   replace with real project photos in `public/images` and delete the remote
   pattern.
-- The two 360° panoramas are Poly Haven samples (CC0); replace them with real
-  360 photos and remove `"panoramaDemo": true`.
+- All 360° panoramas are AI concepts; replace them with real 360 photos and
+  remove `"panoramaDemo": true`.
 - Services, pricing tiers, team members, and testimonials are sample copy —
   replace with the real Geost Studio lists (PRD open question #11).
 - Default `app/favicon.ico` from the scaffold.

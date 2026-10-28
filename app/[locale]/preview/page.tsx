@@ -15,7 +15,7 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
 
   return {
-    title: dict.pages.preview.title,
+    title: dict.nav.preview,
     description: dict.pages.preview.description,
   };
 }

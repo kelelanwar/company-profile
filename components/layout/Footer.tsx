@@ -36,6 +36,11 @@ export function Footer({ locale, footer }: Props) {
             </span>
           </Link>
 
+          <p className="mt-5 flex items-center gap-2.5 text-[11px] font-medium tracking-[0.08em] text-bone/70">
+            <span aria-hidden="true" className="h-px w-5 bg-copper/70" />
+            {footer.companyByline}
+          </p>
+
           <p className="mt-6 max-w-xs text-sm leading-relaxed text-muted">
             {footer.tagline}
           </p>

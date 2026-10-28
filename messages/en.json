@@ -62,7 +62,7 @@
     "panoramaTitle": "360° panorama",
     "panoramaBadge": "360° photo",
     "panoramaHint": "Drag to look around · pinch to zoom",
-    "panoramaDemoNote": "Sample panorama from Poly Haven (CC0) — replace with real project 360 photos.",
+    "panoramaDemoNote": "AI concept panorama based on the portfolio photo — not an original 360° project capture.",
     "panoramaNote": "A 360° photo taken from the middle of the room. Drag to look around."
   },
   "home": {
@@ -419,9 +419,10 @@
     }
   },
   "footer": {
-    "tagline": "An interior design, architecture, and 360° visualization studio based in Bandung.",
+    "tagline": "An interior design, architecture, and 360° visualization studio based in Tangerang.",
     "studioLabel": "Studio",
-    "address": "Jl. Cihampelas No. 120, Bandung, West Java 40131",
+    "address": "Jalan Prof. Dr. Hamka RT 005/007, Gaga, Tangerang, Banten, 15154, Indonesia",
+    "companyByline": "by PT. INDAH SELARAS MANDIRI",
     "phoneLabel": "WhatsApp",
     "emailLabel": "Email",
     "hours": "Monday–Friday, 09.00–18.00 WIB",

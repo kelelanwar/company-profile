@@ -15,7 +15,7 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
 
   return {
-    title: dict.pages.contact.title,
+    title: dict.nav.contact,
     description: dict.pages.contact.description,
   };
 }
@@ -49,7 +49,7 @@ export default async function ContactPage({
       label: copy.studioLabel,
       value: dict.footer.address,
       note: copy.studioNote,
-      href: "https://maps.google.com/?q=Jl.+Cihampelas+120+Bandung",
+      href: `https://maps.google.com/?q=${encodeURIComponent(dict.footer.address)}`,
       external: true,
     },
   ];
