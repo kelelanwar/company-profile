@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "powershell",
+      "Shell(set:*)",
+      "Shell(node C:\\Users\\chair\\AppData\\Local\\Temp\\commandcode\\c--Users-chair-OneDrive-Desktop-Kuliah-Anwar-KKP--Kuliah-Kerja-Praktek--company-profile\\d4c1f87c-8ceb-426c-ab8b-27565c03dbc9\\scratchpad\\shot-team.cjs)"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}
