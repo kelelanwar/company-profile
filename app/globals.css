@@ -95,12 +95,37 @@
   animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+@keyframes scroll-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  #content > :not(article),
+  #content > article > * {
+    animation: scroll-reveal 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 35%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
   .animate-rise {
+    animation: none;
+  }
+
+  #content > :not(article),
+  #content > article > * {
     animation: none;
   }
 }
